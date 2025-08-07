@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select User Type</title>
+    
+    <!-- Link to external stylesheet -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        ul.autocomplete {
+            list-style: none;
+            padding: 0;
+            border: 1px solid #ccc;
+            max-height: 200px;
+            overflow-y: auto;
+            position: absolute;
+            background: white;
+            width: 300px;
+            z-index: 10;
+        }
+        ul.autocomplete li {
+            padding: 8px;
+            cursor: pointer;
+        }
+        ul.autocomplete li:hover {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+    <h2>Search for a teacher</h2>
+    <form id="teacher-form" method="post" action="/">
+        <input type="hidden" name="teacher_id" id="teacher-id">
+        <input type="text" id="teacher-search" placeholder="Type a name..." autocomplete="off">
+        <ul class="autocomplete" id="autocomplete-list"></ul>
+    </form>
+    <script src="{{ url_for('static', filename='autocomplete.js') }}"></script>
+</body>
+</html>

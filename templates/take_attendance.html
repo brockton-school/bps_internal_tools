@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In or Sign Out</title>
+
+    <!-- Link to external stylesheet -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <!-- Link to external JS scripts -->
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</head>
+<body>
+    <h2>Take Attendance</h2>
+    {% if submitted %}
+        <p>Attendance submitted. The following students have been recorded as absent:</p>
+        <ul>
+            {% for student in students if student.user_id in absent_ids %}
+            <li>{{ student.full_name }}</li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('index') }}">Start over</a>
+    {% else %}
+        <h3>Select all who are ABSENT.</h3>
+        <form method="post">
+            {% for student in students %}
+                <div>
+                    <label>
+                        <input type="checkbox" name="absent" value="{{ student.user_id }}">
+                        {{ student.full_name }}
+                    </label>
+                </div>
+            {% endfor %}
+            <button type="submit">Submit Attendance</button>
+        </form>
+    {% endif %}
+</body>
+</html>

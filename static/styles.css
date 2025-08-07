@@ -1,0 +1,113 @@
+/* General Layout */
+body {
+    font-family: 'Nunito Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+/* Page container */
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* Headings */
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
+
+/* Teacher Search & Forms */
+input[type="text"], select {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+}
+
+/* Search Suggestions */
+.suggestions {
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 8px;
+    margin-top: -10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.suggestions div {
+    padding: 12px;
+    cursor: pointer;
+}
+
+.suggestions div:hover {
+    background: #f0f0f0;
+}
+
+/* Buttons */
+button, input[type="submit"] {
+    background-color: #007BFF;
+    color: white;
+    padding: 14px 20px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+
+button:hover, input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Attendance Checkboxes */
+.attendance-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.attendance-item {
+    flex: 1 1 calc(50% - 10px);
+    background: white;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+}
+
+.attendance-item label {
+    flex: 1;
+    font-size: 1.1rem;
+    padding-left: 8px;
+}
+
+/* Larger Touch-friendly Checkboxes */
+.attendance-item input[type="checkbox"] {
+    transform: scale(1.5);
+    margin-right: 12px;
+}
+
+/* Submitted Confirmation */
+.success-message {
+    text-align: center;
+    background-color: #d4edda;
+    color: #155724;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    margin-top: 20px;
+}
+
+/* Responsive for Tablets */
+@media (max-width: 768px) {
+    .attendance-item {
+        flex: 1 1 100%;
+    }
+}

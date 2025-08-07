@@ -1,0 +1,10 @@
+Flask==2.3.3
+gspread
+google-auth
+pytz==2023.3
+werkzeug
+python-dotenv
+openpyxl
+pandas
+werkzeug
+gspread_formatting

@@ -1,0 +1,3 @@
+username,hashed_password
+user1,pbkdf2:sha256:600000$example1$hashedpasswordexample1
+user2,pbkdf2:sha256:600000$example2$hashedpasswordexample2

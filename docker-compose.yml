@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  bps-toc-attendance:
+    build:
+      context: .
+      args:
+        GIT_COMMIT: ${GIT_COMMIT}
+        GIT_VERSION: ${GIT_VERSION}
+    ports:
+      - "5000:5000"
+    environment:
+      - GOOGLE_SHEET_ID=${GOOGLE_SHEET_ID}
+      - GOOGLE_CREDENTIALS_PATH=${GOOGLE_CREDENTIALS_PATH}
+      - SECRET_KEY=${FLASK_SECRET_KEY}
+    volumes:
+      - ${LOCAL_GOOGLE_CREDENTIALS_PATH}:${GOOGLE_CREDENTIALS_PATH}
+      - ${LOCAL_DATA_PATH}:/app/data
+      - ./grades.csv:/app/grades.csv  # Mount the CSV file inside the container
+      - ./env:/app/env  # Mount the CSV files into the container
+
