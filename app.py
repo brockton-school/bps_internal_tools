@@ -28,21 +28,32 @@ def inject_footer_info():
         "copyright_text": "© 2025 Brockton School. All rights reserved."
     }
 
+@app.context_processor
+def inject_page_meta():
+    return {
+        "page_title": "Internal Tools",          # default for /
+        "page_subtitle": "Choose a tool to begin",
+        "active_tool": None                      # None on tools index; set string inside tools
+    }
+
 # Mount the feature under /toc-attendance
 app.register_blueprint(toc_bp, url_prefix="/toc-attendance")
 
 @app.route("/")
 @login_required
 def tools_index():
-    tools = [
-        {
-            "name": "TOC Attendance",
-            "description": "Take attendance for a covered class.",
-            "url": "/toc-attendance/index"
-        },
-        # add more tools here later
-    ]
-    return render_template("tools_index.html", tools=tools)
+    tools = [{
+        "name": "TOC Attendance",
+        "description": "Take attendance for a covered class.",
+        "url": url_for("toc.index"),
+    }]
+    return render_template(
+        "tools_index.html",
+        tools=tools,
+        page_title="Internal Tools",
+        page_subtitle="Choose a tool to begin",
+        active_tool=None
+    )
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

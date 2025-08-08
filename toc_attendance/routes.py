@@ -14,8 +14,10 @@ def home():
 @toc_bp.route("/index", methods=["GET", "POST"])
 @login_required
 def index():
-    # this is the teacher search page
-    return render_template("index.html")
+    return render_template("index.html",
+                           page_title="TOC Attendance",
+                           page_subtitle="Simple attendance form for senior school coverage.",
+                           active_tool="TOC Attendance")
 
 @toc_bp.route("/search-teachers")
 @login_required
@@ -32,7 +34,12 @@ def select_course(teacher_id):
         course_id = request.form["course_id"]
         return redirect(url_for("toc.take_attendance", course_id=course_id, teacher_id=teacher_id))
     courses = get_courses_for_user(teacher_id, role="teacher", terms=DEFAULT_TERMS)
-    return render_template("select_course.html", courses=courses, teacher_id=teacher_id)
+    return render_template("select_course.html",
+                           courses=courses,
+                           teacher_id=teacher_id,
+                           page_title="TOC Attendance",
+                           page_subtitle="Simple attendance form for senior school coverage.",
+                           active_tool="TOC Attendance")
 
 @toc_bp.route("/take_attendance/<course_id>", methods=["GET","POST"])
 @login_required
@@ -52,9 +59,15 @@ def take_attendance(course_id):
                                submitted=True,
                                absent_ids=absent_ids,
                                course_name=course_name,
-                               teacher_id=teacher_id)
+                               teacher_id=teacher_id,
+                               page_title="TOC Attendance",
+                               page_subtitle="Simple attendance form for senior school coverage.",
+                               active_tool="TOC Attendance")
     return render_template("take_attendance.html",
                            students=students,
                            submitted=False,
                            course_name=course_name,
-                           teacher_id=teacher_id)
+                           teacher_id=teacher_id,
+                           page_title="TOC Attendance",
+                           page_subtitle="Simple attendance form for senior school coverage.",
+                           active_tool="TOC Attendance")
