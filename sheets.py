@@ -6,9 +6,7 @@ import os
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_CREDENTIALS_PATH')
-#SERVICE_ACCOUNT_FILE = "env/splendid-sunset-436122-n9-2a123c008b07.json"
 GOOGLE_SHEET_ID = os.getenv('GOOGLE_SHEET_ID')
-#GOOGLE_SHEET_ID = "1MqP7hlhQIpsFv8o8Y4tefU2p8eDOlUjH3ooP7_40i_M"
 
 credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 client = gspread.authorize(credentials)
