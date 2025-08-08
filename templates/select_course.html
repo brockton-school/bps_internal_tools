@@ -1,31 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enter Name</title>
-    
-    <!-- Link to external stylesheet -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="{{ url_for('static', filename='autocomplete.js') }}"></script>  <!-- Add JS file for autocomplete -->
-
-    <!-- Make text field focused by default -->
-    <script>
-        window.onload = function() {
-            setupNamePage();
-        };
-    </script>
-</head>
-<body>
-    <h2>Select a course</h2>
+{% extends "base.html" %}
+{% block title %}Select Course · TOC Attendance{% endblock %}
+{% block content %}
+  <div class="card">
+    <div class="meta">Teacher ID: <strong>{{ teacher_id }}</strong></div>
+    <label for="course">Which course are you covering?</label>
     <form method="post">
-        <select name="course_id">
-            {% for course in courses %}
-            <option value="{{ course.course_id }}">{{ course.short_name }} — {{ course.long_name }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Next</button>
+      <select id="course" name="course_id" required>
+        {% for c in courses %}
+          <option value="{{ c.course_id }}">{{ c.short_name }} — {{ c.long_name }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn" type="submit">Continue to Attendance</button>
+      <a class="btn secondary" href="{{ url_for('index') }}">Back</a>
     </form>
-</body>
-</html>
+  </div>
+{% endblock %}

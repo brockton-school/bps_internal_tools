@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Brockton TOC Attendance{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">B</div>
+      <div>
+        <h1>Brockton Attendance</h1>
+        <div class="sub">Quick attendance entry without MySchool.</div>
+      </div>
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+      <div>{{ copyright_text }}</div>
+      <div>Version: {{ version_info }}</div>
+    </footer>
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

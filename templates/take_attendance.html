@@ -1,40 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In or Sign Out</title>
-
-    <!-- Link to external stylesheet -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-
-    <!-- Link to external JS scripts -->
-    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
-</head>
-<body>
-    <h2>Take Attendance</h2>
-    {% if submitted %}
-        <p>Attendance submitted. The following students have been recorded as absent:</p>
-        <ul>
-            {% for student in students if student.user_id in absent_ids %}
-            <li>{{ student.full_name }}</li>
-            {% endfor %}
-        </ul>
-        <a href="{{ url_for('index') }}">Start over</a>
-    {% else %}
-        <h3>Select all who are ABSENT.</h3>
-        <form method="post">
-            {% for student in students %}
-                <div>
-                    <label>
-                        <input type="checkbox" name="absent" value="{{ student.user_id }}">
-                        {{ student.full_name }}
-                    </label>
-                </div>
-            {% endfor %}
-            <button type="submit">Submit Attendance</button>
-        </form>
+{% extends "base.html" %}
+{% block title %}Take Attendance · TOC Attendance{% endblock %}
+{% block content %}
+  <div class="card">
+    {% if course_name %}
+      <div class="meta">Course: <strong>{{ course_name }}</strong></div>
     {% endif %}
-</body>
-</html>
+
+    {% if submitted %}
+      {% set absent_count = absent_ids|length %}
+      {% if absent_count > 0 %}
+        <div class="notice">{{ absent_count }} absent recorded. Logged to Google Sheets.</div>
+      {% else %}
+        <div class="notice">All students present. Logged to Google Sheets.</div>
+      {% endif %}
+      <a class="btn" href="{{ url_for('index') }}">Start Over</a>
+    {% else %}
+      <form method="post">
+        <label>Select any absent students</label>
+        <div class="grid">
+          {% for s in students %}
+            <label class="tile">
+              <input type="checkbox" name="absent" value="{{ s['user_id'] }}">
+              <span>{{ s['full_name'] }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        <button class="btn" type="submit">Submit Attendance</button>
+        <a class="btn secondary" href="{{ url_for('select_course', teacher_id=teacher_id) }}">Back</a>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}
