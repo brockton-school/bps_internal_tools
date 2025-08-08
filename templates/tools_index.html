@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Internal Tools{% endblock %}
+{% block content %}
+  <div class="card">
+    <h2 style="margin-top:0">Internal Tools</h2>
+    <div class="grid">
+      {% for t in tools %}
+      <div class="tile" style="flex-direction:column; align-items:flex-start;">
+        <div style="font-weight:800; font-size:1.1rem;">{{ t.name }}</div>
+        <div style="color:var(--muted); margin:6px 0 12px;">{{ t.description }}</div>
+        <a class="btn" style="width:auto;" href="{{ t.url }}">Open</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
