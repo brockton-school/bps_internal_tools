@@ -8,8 +8,14 @@ app = Flask(__name__)
 
 @app.context_processor
 def inject_footer_info():
+    vi = get_version_info()
+    github_repo = "https://github.com/brockton-school/bps_toc-attendance"
+    commit_url = f"{github_repo}/commit/{vi['commit']}" if vi['commit'] != "unknown" else None
+
     return {
-        "version_info": get_version_info(),
+        "version_info": vi['version'],
+        "commit_hash": vi['commit'],
+        "commit_url": commit_url,
         "copyright_text": "© 2025 Brockton School. All rights reserved."
     }
 

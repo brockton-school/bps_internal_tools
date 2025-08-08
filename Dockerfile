@@ -12,7 +12,8 @@ ARG GIT_COMMIT
 ARG GIT_VERSION
 
 # Write the vars to a text file
-RUN echo "Build Version: $GIT_VERSION ($GIT_COMMIT)" > /app/version_info.txt
+RUN echo "$GIT_COMMIT" > /app/git_commit.txt
+RUN echo "$GIT_VERSION" > /app/git_version.txt
 
 # Install any necessary dependencies
 RUN pip install -r requirements.txt

@@ -20,8 +20,15 @@
     {% block content %}{% endblock %}
 
     <footer>
-      <div>{{ copyright_text }}</div>
-      <div>Version: {{ version_info }}</div>
+    <div>{{ copyright_text }}</div>
+    <div>
+        Version: {{ version_info }}
+        {% if commit_url %}
+        (<a href="{{ commit_url }}" target="_blank" style="color: var(--brand); text-decoration: none;">{{ commit_hash }}</a>)
+        {% else %}
+        ({{ commit_hash }})
+        {% endif %}
+    </div>
     </footer>
   </div>
   {% block scripts %}{% endblock %}
