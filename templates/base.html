@@ -17,6 +17,15 @@
       </div>
     </div>
 
+    {% if auth_user %}
+      <div class="card" style="margin-bottom:14px; display:flex; align-items:center; gap:10px; justify-content:space-between;">
+        <div>Signed in as <strong>{{ auth_user.display_name or auth_user.username }}</strong></div>
+        <form method="post" action="{{ url_for('logout') }}">
+          <button class="btn secondary" type="submit" style="width:auto; padding:10px 14px;">Log out</button>
+        </form>
+      </div>
+    {% endif %}
+
     {% block content %}{% endblock %}
 
     <footer>
