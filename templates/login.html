@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Sign in · TOC Attendance{% endblock %}
+{% block content %}
+  <div class="card">
+    <h2 style="margin-top:0">Sign in</h2>
+    {% with msgs = get_flashed_messages(category_filter=["error"]) %}
+      {% if msgs %}
+        <div class="notice error">{{ msgs[0] }}</div>
+      {% endif %}
+    {% endwith %}
+    <form method="post">
+      <label for="username">Username</label>
+      <input id="username" class="input" name="username" required autofocus>
+
+      <label for="password">Password</label>
+      <input id="password" class="input" type="password" name="password" required>
+
+      <button class="btn" type="submit">Sign in</button>
+    </form>
+  </div>
+{% endblock %}
