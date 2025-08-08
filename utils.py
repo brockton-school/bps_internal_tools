@@ -12,13 +12,20 @@ def format_time(datetime_obj):
 def get_version_info():
     try:
         # Define the path to the version info file
-        version_file_path = "/app/version_info.txt"
+        commit_hash_file_path = "/app/git_commit.txt"
+        version_name_file_path = "/app/git_version.txt"
         
         # Open and read the file
-        with open(version_file_path, "r") as file:
-            version_info = file.read().strip()
+        with open(commit_hash_file_path, "r") as file:
+            commit = file.read().strip()
+
+        with open(version_name_file_path, "r") as file:
+            version = file.read().strip()
         
-        return version_info
+        return {
+            "version": version,
+            "commit": commit
+        }
     except FileNotFoundError:
         # Return a default message if the file is not found
         return "Version information not available"
