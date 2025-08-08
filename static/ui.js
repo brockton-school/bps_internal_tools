@@ -16,4 +16,27 @@
   document.addEventListener('keydown', (e)=>{
     if(e.key === 'Escape') close();
   });
+
+    // ---- Theme handling ----
+  const THEME_KEY = 'theme';
+  const body = document.body;
+
+  // Apply saved theme on load
+  const saved = localStorage.getItem(THEME_KEY);
+  if(saved === 'light'){ body.setAttribute('data-theme','light'); }
+
+  // Toggle button
+  const toggle = document.getElementById('themeToggleBtn');
+  if(toggle){
+    toggle.addEventListener('click', ()=>{
+      const isLight = body.getAttribute('data-theme') === 'light';
+      if(isLight){
+        body.removeAttribute('data-theme');
+        localStorage.setItem(THEME_KEY, 'dark');
+      }else{
+        body.setAttribute('data-theme','light');
+        localStorage.setItem(THEME_KEY, 'light');
+      }
+    });
+  }
 })();

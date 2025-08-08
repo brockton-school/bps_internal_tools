@@ -34,6 +34,42 @@ body {
   font-weight: 500;
 }
 
+/* Light theme override */
+body[data-theme="light"]{
+  --bg: #f6f7fb;
+  --panel: #ffffff;
+  --panel-2: #f5f6fa;
+  --text: #1f2430;
+  --muted: #707a8f;
+  --brand: #ba0c2f;
+  --brand-light: #d9415d;
+  --accent: #6a7284;
+  --danger: #e15454;
+}
+
+/* Optional: soften backgrounds for light mode */
+body[data-theme="light"] .brand {
+  background: linear-gradient(135deg, var(--brand), var(--brand-light));
+  box-shadow: 0 4px 14px rgba(186,12,47,.20);
+}
+body[data-theme="light"] .card{
+  border-color: rgba(14, 20, 40, .06);
+  box-shadow: 0 8px 28px rgba(0,0,0,.06);
+}
+body[data-theme="light"] .menu{
+  border-color: rgba(14, 20, 40, .08);
+  box-shadow: 0 16px 36px rgba(0,0,0,.10);
+}
+body[data-theme="light"] .notice{
+  color: #6b0f21;
+  background: rgba(186,12,47,.10);
+  border-color: rgba(186,12,47,.25);
+}
+
+body[data-theme="light"] {
+  background: radial-gradient(circle at top left, #ffffff, #f6f7fb);
+}
+
 /* ===== Layout ===== */
 .container {
   max-width: 960px;
@@ -102,6 +138,16 @@ h1 {
 }
 .avatar-initials{ user-select:none; }
 
+/* Avatar in light mode — more subtle gradient */
+body[data-theme="light"] .avatar-btn {
+  background: radial-gradient(
+      120% 120% at 30% 20%, 
+      rgba(255, 230, 235, 0.7) 0%,  /* pale pink */
+      rgba(186, 12, 47, 0.9) 75%   /* brand red, less opacity */
+    ), var(--brand);
+  box-shadow: 0 4px 10px rgba(186,12,47,.18);
+}
+
 .menu{
   position:absolute; right:0; top: calc(100% + 8px);
   min-width: 220px;
@@ -124,7 +170,16 @@ h1 {
   text-decoration:none; border-radius:10px; cursor:pointer;
 }
 .menu-item:hover{ background: rgba(186,12,47,.15); }
-.menu-item.danger{ color:#ffd9d9; }
+
+/* Clear red (brand) logout style, same size */
+.menu-item.logout {
+  color: var(--brand);
+  border: 1px solid transparent;
+}
+.menu-item.logout:hover {
+  background: rgba(186, 12, 47, .10);
+  border-color: rgba(186, 12, 47, .25);
+}
 
 
 /* ===== Panels & Cards ===== */

@@ -39,8 +39,14 @@
             <div class="menu-header">{{ auth_user.display_name or auth_user.username }}</div>
             <a class="menu-item" href="{{ url_for('tools_index') }}">All Tools</a>
             <!-- Future: <a class="menu-item" href="#">Profile</a> -->
+            
+            <!-- Light theme toggle -->
+            <button class="menu-item" type="button" id="themeToggleBtn">
+              Toggle Light Theme
+            </button>
+            
             <form method="post" action="{{ url_for('logout') }}">
-              <button class="menu-item danger" type="submit">Log out</button>
+              <button class="menu-item logout" type="submit">Log out</button>
             </form>
           </div>
         </div>

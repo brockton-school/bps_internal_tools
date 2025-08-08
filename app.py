@@ -31,7 +31,7 @@ def inject_footer_info():
 @app.context_processor
 def inject_page_meta():
     return {
-        "page_title": "Internal Tools",          # default for /
+        "page_title": "Brockton School Internal Tools",          # default for /
         "page_subtitle": "Choose a tool to begin",
         "active_tool": None                      # None on tools index; set string inside tools
     }
