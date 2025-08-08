@@ -18,7 +18,7 @@ def inject_auth_user():
 @app.context_processor
 def inject_footer_info():
     vi = get_version_info()
-    github_repo = "https://github.com/brockton-school/bps_toc-attendance"
+    github_repo = "https://github.com/brockton-school/bps_internal_tools"
     commit_url = f"{github_repo}/commit/{vi['commit']}" if vi['commit'] != "unknown" else None
 
     return {
@@ -66,7 +66,10 @@ def login():
             nxt = request.args.get("next") or url_for("index")
             return redirect(nxt)
         flash("Invalid username or password.", "error")
-    return render_template("login.html")
+    return render_template("login.html", 
+                           page_title="Brockton School Internal Tools",
+                           page_subtitle="Authentication Required, Please Sign In",
+                           active_tool=None)
 
 @app.route("/logout", methods=["POST"])
 def logout():
