@@ -9,37 +9,66 @@
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <div class="logo">B</div>
-      <div>
-        <h1>Brockton Attendance</h1>
-        <div class="sub">Quick attendance entry without MySchool.</div>
+    <!-- Top App Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <a class="brand" href="{{ url_for('tools_index') }}" aria-label="Brockton Tools Home">B</a>
+        <div class="titles">
+          <h1 class="app-title">
+            {% if active_tool %}{{ active_tool }}{% else %}Internal Tools{% endif %}
+          </h1>
+          <div class="app-sub">
+            {% if active_tool %}
+              {{ page_subtitle or "Fast, simple, and touch-friendly" }}
+            {% else %}
+              {{ page_subtitle or "Choose a tool to begin" }}
+            {% endif %}
+          </div>
+        </div>
       </div>
-    </div>
 
-    {% if auth_user %}
-      <div class="card" style="margin-bottom:14px; display:flex; align-items:center; gap:10px; justify-content:space-between;">
-        <div>Signed in as <strong>{{ auth_user.display_name or auth_user.username }}</strong></div>
-        <form method="post" action="{{ url_for('logout') }}">
-          <button class="btn secondary" type="submit" style="width:auto; padding:10px 14px;">Log out</button>
-        </form>
+      {% if auth_user %}
+      <div class="topbar-right">
+        <div class="user-menu">
+          <button class="avatar-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false" title="{{ auth_user.display_name or auth_user.username }}">
+            <span class="avatar-initials">
+              {{ (auth_user.display_name or auth_user.username)[:1] | upper }}
+            </span>
+          </button>
+          <div class="menu" id="userDropdown" role="menu" aria-labelledby="userMenuBtn">
+            <div class="menu-header">{{ auth_user.display_name or auth_user.username }}</div>
+            <a class="menu-item" href="{{ url_for('tools_index') }}">All Tools</a>
+            <!-- Future: <a class="menu-item" href="#">Profile</a> -->
+            
+            <!-- Light theme toggle -->
+            <button class="menu-item" type="button" id="themeToggleBtn">
+              Toggle Light Theme
+            </button>
+            
+            <form method="post" action="{{ url_for('logout') }}">
+              <button class="menu-item logout" type="submit">Log out</button>
+            </form>
+          </div>
+        </div>
       </div>
-    {% endif %}
+      {% endif %}
+    </header>
 
     {% block content %}{% endblock %}
 
     <footer>
-    <div>{{ copyright_text }}</div>
-    <div>
+      <div>{{ copyright_text }}</div>
+      <div>
         Version: {{ version_info }}
         {% if commit_url %}
-        (<a href="{{ commit_url }}" target="_blank" style="color: var(--brand); text-decoration: none;">{{ commit_hash }}</a>)
+          (<a href="{{ commit_url }}" target="_blank">{{ commit_hash }}</a>)
         {% else %}
-        ({{ commit_hash }})
+          ({{ commit_hash }})
         {% endif %}
-    </div>
+      </div>
     </footer>
   </div>
   {% block scripts %}{% endblock %}
+  <script src="{{ url_for('static', filename='ui.js') }}"></script>
 </body>
 </html>

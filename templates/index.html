@@ -18,10 +18,9 @@
     inputId: 'q',
     listId: 'ac',
     clearId: 'clearBtn',
-    searchUrl: '{{ url_for("search_teachers") }}', // '/search-teachers'
+    searchUrl: '{{ url_for("toc.search_teachers") }}',
     onPick: (teacher) => {
-      // redirect to their courses
-      window.location.href = "{{ url_for('select_course', teacher_id='__ID__') }}".replace('__ID__', encodeURIComponent(teacher.id));
+      window.location.href = "{{ url_for('toc.select_course', teacher_id='__ID__') }}".replace('__ID__', encodeURIComponent(teacher.id));
     }
   });
 </script>

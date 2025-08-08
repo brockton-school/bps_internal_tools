@@ -13,7 +13,7 @@
       {% else %}
         <div class="notice">All students present. Logged to Google Sheets.</div>
       {% endif %}
-      <a class="btn" href="{{ url_for('index') }}">Start Over</a>
+      <a class="btn" href="{{ url_for('toc.index') }}">Start Over</a>
     {% else %}
       <form method="post">
         <label>Select any absent students</label>
@@ -26,7 +26,7 @@
           {% endfor %}
         </div>
         <button class="btn" type="submit">Submit Attendance</button>
-        <a class="btn secondary" href="{{ url_for('select_course', teacher_id=teacher_id) }}">Back</a>
+        <a class="btn secondary" href="{{ url_for('toc.select_course', teacher_id=teacher_id) }}">Back</a>
       </form>
     {% endif %}
   </div>
