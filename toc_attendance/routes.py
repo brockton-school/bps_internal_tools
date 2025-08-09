@@ -1,18 +1,21 @@
 from flask import render_template, request, redirect, url_for
-from auth import login_required, current_user
-from . import toc_bp
+from auth import login_required, current_user, tool_required
+from . import toc_bp, TOOL_SLUG
 from queries import search_teacher_by_name, get_courses_for_user, get_students_in_course, get_course_info
 from sheets import log_attendance
 from config import DEFAULT_TERMS
 
+
 @toc_bp.route("/", methods=["GET"])
 @login_required
+@tool_required(TOOL_SLUG)
 def home():
     # optional landing page for toc feature; could redirect to teacher search
     return redirect(url_for("toc.index"))
 
 @toc_bp.route("/index", methods=["GET", "POST"])
 @login_required
+@tool_required(TOOL_SLUG)
 def index():
     return render_template("index.html",
                            page_title="TOC Attendance",
@@ -21,6 +24,7 @@ def index():
 
 @toc_bp.route("/search-teachers")
 @login_required
+@tool_required(TOOL_SLUG)
 def search_teachers():
     from flask import jsonify, request
     q = request.args.get("q", "")
@@ -29,6 +33,7 @@ def search_teachers():
 
 @toc_bp.route("/select_course/<teacher_id>", methods=["GET","POST"])
 @login_required
+@tool_required(TOOL_SLUG)
 def select_course(teacher_id):
     if request.method == "POST":
         course_id = request.form["course_id"]
@@ -43,6 +48,7 @@ def select_course(teacher_id):
 
 @toc_bp.route("/take_attendance/<course_id>", methods=["GET","POST"])
 @login_required
+@tool_required(TOOL_SLUG)
 def take_attendance(course_id):
     students = get_students_in_course(course_id)
     info = get_course_info(course_id) # returns {'short_name':..., 'long_name':...}

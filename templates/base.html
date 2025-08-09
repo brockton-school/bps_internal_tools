@@ -40,7 +40,7 @@
             <a class="menu-item" href="{{ url_for('tools_index') }}">All Tools</a>
             <!-- Future: <a class="menu-item" href="#">Profile</a> -->
 
-            {% if 'admin' in (auth_user.roles or []) %}
+            {% if 'admin' in (auth_user.role or []) %}
             <a class="menu-item" href="{{ url_for('admin.settings_home') }}">Settings</a>
             {% endif %}
             

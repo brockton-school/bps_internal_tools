@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
-from auth import authenticate, login_required, current_user, has_any_role
+from auth import authenticate, login_required, current_user, role_allows_tool
 from config import DEFAULT_TERMS
-from sheets import log_attendance
 from utils import get_version_info
 from toc_attendance import toc_bp
 from admin import admin_bp
@@ -54,18 +53,15 @@ def page_not_found(e):
 @app.route("/")
 @login_required
 def tools_index():
-    user = current_user()
+    u = current_user()
     tools = []
-
-    def can(*roles): return has_any_role(user, roles)
-
-    if can("attendance", "admin"):
+    if role_allows_tool(u["role"], "toc_attendance"):
         tools.append({
             "name": "TOC Attendance",
             "description": "Take attendance for a covered class.",
             "url": url_for("toc.index"),
+            "slug": "toc_attendance",
         })
-
     return render_template("tools_index.html",
                            tools=tools,
                            page_title="Internal Tools",
