@@ -2,10 +2,10 @@ import sqlite3
 import pandas as pd
 
 # File paths
-COURSES_CSV = 'env/sis_export/courses.csv'
-ENROLLMENTS_CSV = 'env/sis_export/enrollments.csv'
-USERS_CSV = 'env/sis_export/users.csv'
-DB_FILE = 'data/canvas.db'
+COURSES_CSV = '../env/sis_export/courses.csv'
+ENROLLMENTS_CSV = '../env/sis_export/enrollments.csv'
+USERS_CSV = '../env/sis_export/users.csv'
+DB_FILE = '../data/canvas.db'
 
 # Connect to SQLite database (or create it)
 conn = sqlite3.connect(DB_FILE)
