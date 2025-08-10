@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Admin · Settings{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2 style="margin-top:0">Settings</h2>
+  <div class="grid">
+    <!-- Roles card -->
+    <div class="tile" style="flex-direction:column; align-items:flex-start;">
+      <div style="font-weight:800; font-size:1.1rem;">Roles</div>
+      <div style="color:var(--muted); margin:6px 0 12px;">
+        Control which tools each role can access.
+        <br>Roles: {{ stats.role_count }} ({{ stats.active_roles }} active)
+      </div>
+      <a class="btn" style="width:auto;" href="{{ url_for('admin.roles_page') }}">Manage Roles</a>
+    </div>
+
+    <!-- Users card -->
+    <div class="tile" style="flex-direction:column; align-items:flex-start;">
+      <div style="font-weight:800; font-size:1.1rem;">Users</div>
+      <div style="color:var(--muted); margin:6px 0 12px;">
+        Create users and assign a single role.
+        <br>Users: {{ stats.user_count }} ({{ stats.active_users }} active)
+      </div>
+      <a class="btn" style="width:auto;" href="{{ url_for('admin.users_page') }}">Manage Users</a>
+    </div>
+
+    <!-- Future settings live here -->
+    <div class="tile" style="flex-direction:column; align-items:flex-start; opacity:.7;">
+      <div style="font-weight:800; font-size:1.1rem;">Integrations</div>
+      <div style="color:var(--muted); margin:6px 0 12px;">
+        Google Workspace, directory sync, etc. (coming soon)
+      </div>
+      <button class="btn secondary" style="width:auto;" disabled>Coming Soon</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

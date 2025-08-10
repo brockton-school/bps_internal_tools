@@ -330,3 +330,27 @@ footer {
   border-top: 1px solid rgba(255,255,255,.08);
   text-align: center;
 }
+
+/* ===== Error pages ===== */
+.error-page {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.error-page h1 {
+    font-size: 5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.error-page p {
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+    color: var(--muted);
+}
+
+.error-page .btn {
+    font-size: 1rem;
+    padding: 10px 20px;
+}

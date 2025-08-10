@@ -39,6 +39,10 @@
             <div class="menu-header">{{ auth_user.display_name or auth_user.username }}</div>
             <a class="menu-item" href="{{ url_for('tools_index') }}">All Tools</a>
             <!-- Future: <a class="menu-item" href="#">Profile</a> -->
+
+            {% if 'admin' in (auth_user.role or []) %}
+            <a class="menu-item" href="{{ url_for('admin.settings_home') }}">Settings</a>
+            {% endif %}
             
             <!-- Light theme toggle -->
             <button class="menu-item" type="button" id="themeToggleBtn">
