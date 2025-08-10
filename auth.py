@@ -42,28 +42,6 @@ def _atomic_write(path, fieldnames, rows):
         if os.path.exists(tmp):
             os.remove(tmp)
 
-def save_users(users):
-    rows = []
-    for u in sorted(users.values(), key=lambda x: x["username"]):
-        rows.append({
-            "username": u["username"],
-            "password_hash": u["password_hash"],
-            "display_name": u.get("display_name") or u["username"],
-            "role": u.get("role") or "user",
-            "active": "true" if u.get("active", True) else "false",
-        })
-    _atomic_write(USERS_CSV, ["username","password_hash","display_name","role","active"], rows)
-
-def save_roles(roles):
-    rows = []
-    for r in sorted(roles.values(), key=lambda x: x["role"]):
-        tools = "*" if (r.get("tools")==["*"]) else ",".join(r.get("tools") or [])
-        rows.append({
-            "role": r["role"],
-            "tools": tools,
-            "active": "true" if r.get("active", True) else "false",
-        })
-    _atomic_write(ROLES_CSV, ["role","tools","active"], rows)
 
 
 # ---------- Session / checks ----------
