@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash
-from auth import load_users, load_roles, add_user, update_user, delete_user, add_role, update_role, delete_role, tool_required
-from tools_registry import all_tools, tool_slugs
+from bps_internal_tools.services.auth import load_users, load_roles, add_user, update_user, delete_user, add_role, update_role, delete_role, tool_required
+from bps_internal_tools.tools_registry import all_tools, tool_slugs
 from . import admin_bp, TOOL_SLUG
 
 @admin_bp.route("/settings", methods=["GET"])

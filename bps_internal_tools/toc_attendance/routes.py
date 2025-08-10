@@ -1,9 +1,9 @@
 from flask import render_template, request, redirect, url_for
-from auth import login_required, current_user, tool_required
+from bps_internal_tools.services.auth import login_required, current_user, tool_required
 from . import toc_bp, TOOL_SLUG
-from queries import search_teacher_by_name, get_courses_for_user, get_students_in_course, get_course_info
-from sheets import log_attendance
-from config import DEFAULT_TERMS
+from bps_internal_tools.services.queries import search_teacher_by_name, get_courses_for_user, get_students_in_course, get_course_info
+from bps_internal_tools.services.sheets import log_attendance
+from bps_internal_tools.config import DEFAULT_TERMS
 
 
 @toc_bp.route("/", methods=["GET"])
