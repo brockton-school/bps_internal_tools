@@ -6,10 +6,14 @@ from utils import get_version_info
 from toc_attendance import toc_bp
 from admin import admin_bp
 import os
+from models import Base
+from db import engine
 
 app = Flask(__name__)
 
 app.secret_key = os.getenv("SECRET_KEY", "dev-key")
+
+Base.metadata.create_all(bind=engine)
 
 @app.context_processor
 def inject_auth_user():
