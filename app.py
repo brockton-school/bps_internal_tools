@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from auth import authenticate, login_required, current_user, role_allows_tool
+from tools_registry import all_tools, tool_link
 from config import DEFAULT_TERMS
 from utils import get_version_info
 from toc_attendance import toc_bp
@@ -55,13 +56,9 @@ def page_not_found(e):
 def tools_index():
     u = current_user()
     tools = []
-    if role_allows_tool(u["role"], "toc_attendance"):
-        tools.append({
-            "name": "TOC Attendance",
-            "description": "Take attendance for a covered class.",
-            "url": url_for("toc.index"),
-            "slug": "toc_attendance",
-        })
+    for t in all_tools():
+        if role_allows_tool(u["role"], t["slug"]):
+            tools.append({**t, "url": tool_link(t)})
     return render_template("tools_index.html",
                            tools=tools,
                            page_title="Internal Tools",

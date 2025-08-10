@@ -40,3 +40,19 @@
     });
   }
 })();
+
+// Role tools checkbox mutual exclusion for "*"
+document.addEventListener('change', (e)=>{
+  const el = e.target;
+  if (el.matches('input[type=checkbox][name="tools[]"]')) {
+    const form = el.closest('form');
+    if (!form) return;
+    const allBox = form.querySelector('input[name="tools[]"][value="*"]');
+    const others = form.querySelectorAll('input[name="tools[]"]:not([value="*"])');
+    if (el.value === '*') {
+      if (el.checked) others.forEach(cb => cb.checked = false);
+    } else if (el.checked && allBox) {
+      allBox.checked = false;
+    }
+  }
+});

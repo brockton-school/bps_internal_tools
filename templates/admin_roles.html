@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Admin · Roles{% endblock %}
+{% block content %}
+<div class="card">
+  <h2 style="margin-top:0">Create Role</h2>
+  <form method="post" action="{{ url_for('admin.create_role') }}" style="margin-bottom:16px;">
+    <label>Role name</label>
+    <input class="input" name="role" required placeholder="e.g. admin">
+
+    <label>Tools this role can access</label>
+    <div class="grid">
+      {% for t in tools %}
+        <label class="tile">
+          <input type="checkbox" name="tools[]" value="{{ t.slug }}">
+          <span>{{ t.name }} <span style="color:var(--muted);">({{ t.slug }})</span></span>
+        </label>
+      {% endfor %}
+      <!-- Optional “All tools” checkbox -->
+      <label class="tile">
+        <input type="checkbox" name="tools[]" value="*">
+        <span>All Tools <span style="color:var(--muted);">(admin)</span></span>
+      </label>
+    </div>
+
+    <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+      <input type="checkbox" name="active" checked> Active
+    </label>
+
+    <button class="btn" type="submit">Create Role</button>
+  </form>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h2 style="margin-top:0">Existing Roles</h2>
+  <div class="grid">
+    {% for r in roles %}
+    <div class="tile" style="flex-direction:column; align-items:stretch;">
+      <form method="post" action="{{ url_for('admin.update_role_route', role=r.role) }}">
+        <div><strong>{{ r.role }}</strong> {% if not r.active %}<span style="color:#ffa6a6;">(inactive)</span>{% endif %}</div>
+        <div style="margin-top:8px;">
+          <div style="color:var(--muted); margin-bottom:6px;">Tools</div>
+          <div class="grid">
+            {% set allowed = r.tools %}
+            {% for t in tools %}
+              <label class="tile">
+                <input type="checkbox" name="tools[]" value="{{ t.slug }}"
+                       {% if '*' in allowed or t.slug in allowed %}checked{% endif %}>
+                <span>{{ t.name }} <span style="color:var(--muted);">({{ t.slug }})</span></span>
+              </label>
+            {% endfor %}
+            <label class="tile">
+              <input type="checkbox" name="tools[]" value="*"
+                     {% if allowed == ['*'] %}checked{% endif %}>
+              <span>All Tools</span>
+            </label>
+          </div>
+        </div>
+
+        <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+          <input type="checkbox" name="active" {% if r.active %}checked{% endif %}> Active
+        </label>
+
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn" type="submit" style="width:auto;">Save</button>
+          <form method="post" action="{{ url_for('admin.delete_role_route', role=r.role) }}" onsubmit="return confirm('Delete role {{r.role}}?')">
+            <button class="btn danger" type="submit" style="width:auto;">Delete</button>
+          </form>
+        </div>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

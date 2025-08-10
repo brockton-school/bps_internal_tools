@@ -1,46 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Admin Settings · Internal Tools{% endblock %}
+{% block title %}Admin · Users{% endblock %}
 {% block content %}
 <div class="card">
-  <h2 style="margin-top:0">Roles</h2>
-  <form method="post" action="{{ url_for('admin.create_role') }}" style="margin-bottom:16px;">
-    <label>Role name</label>
-    <input class="input" name="role" required placeholder="e.g. admin">
-
-    <label>Tools (comma-separated or * for all)</label>
-    <input class="input" name="tools" placeholder="e.g. toc_attendance,tool_b or *">
-
-    <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-      <input type="checkbox" name="active" checked> Active
-    </label>
-
-    <button class="btn" type="submit">Create Role</button>
-  </form>
-
-  <div class="grid">
-    {% for r in roles %}
-    <div class="tile" style="flex-direction:column; align-items:stretch;">
-      <form method="post" action="{{ url_for('admin.update_role_route', role=r.role) }}">
-        <div><strong>{{ r.role }}</strong> {% if not r.active %}<span style="color:#ffa6a6;">(inactive)</span>{% endif %}</div>
-        <label style="margin-top:8px;">Tools (comma-separated or *)</label>
-        <input class="input" name="tools" value="{{ '*' if r.tools == ['*'] else (r.tools|join(',')) }}">
-        <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-          <input type="checkbox" name="active" {% if r.active %}checked{% endif %}> Active
-        </label>
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button class="btn" type="submit" style="width:auto;">Save</button>
-          <form method="post" action="{{ url_for('admin.delete_role_route', role=r.role) }}" onsubmit="return confirm('Delete role {{r.role}}?')">
-            <button class="btn danger" type="submit" style="width:auto;">Delete</button>
-          </form>
-        </div>
-      </form>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-
-<div class="card" style="margin-top:16px;">
-  <h2 style="margin-top:0">Users</h2>
+  <h2 style="margin-top:0">Create User</h2>
   <form method="post" action="{{ url_for('admin.create_user_route') }}" style="margin-bottom:16px;">
     <label>Username</label>
     <input class="input" name="username" required>
@@ -56,7 +18,10 @@
     <input class="input" type="password" name="password" required>
     <button class="btn" type="submit">Create User</button>
   </form>
+</div>
 
+<div class="card" style="margin-top:16px;">
+  <h2 style="margin-top:0">Existing Users</h2>
   <div class="grid">
     {% for u in users %}
     <div class="tile" style="flex-direction:column; align-items:stretch;">
