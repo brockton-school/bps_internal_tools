@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./bps_internal_tools"
+    ]
+}

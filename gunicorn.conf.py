@@ -1,0 +1,10 @@
+bind = "0.0.0.0:8000"
+worker_class = "gthread"
+workers = 2              # adjust for CPU cores
+threads = 4
+timeout = 60             # allow slow cold starts
+graceful_timeout = 30
+keepalive = 5
+accesslog = "-"          # log to stdout
+errorlog = "-"
+loglevel = "info"

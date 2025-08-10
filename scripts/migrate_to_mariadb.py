@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
 
 # Import from your project package/root. Run with: python -m scripts.migrate_to_mariadb
-from models import Base, Course, People, Enrollment, Role, RoleTool, User
+from bps_internal_tools.models import Base, Course, People, Enrollment, Role, RoleTool, User
 
 def parse_args():
     p = argparse.ArgumentParser(description="Migrate SQLite + CSV auth to MariaDB (idempotent).")

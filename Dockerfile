@@ -1,8 +1,15 @@
 # Use an official Python runtime as a parent image
 FROM python:3.11-slim
 
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
 # Set the working directory in the container
 WORKDIR /app
+
+# Install deps first for better layer caching
+COPY requirements.txt /app/requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Copy the current directory contents into the container
 COPY . /app
@@ -15,14 +22,6 @@ ARG GIT_VERSION
 RUN echo "$GIT_COMMIT" > /app/git_commit.txt
 RUN echo "$GIT_VERSION" > /app/git_version.txt
 
-# Install any necessary dependencies
-RUN pip install -r requirements.txt
-
-# Make port 5000 available to the world outside this container
-EXPOSE 5000
-
-# Define environment variable
-ENV FLASK_APP=app.py
-
-# Run the application
-CMD ["flask", "run", "--host=0.0.0.0"]
+COPY . .
+ENV FLASK_APP=wsgi:app
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "wsgi:app"]

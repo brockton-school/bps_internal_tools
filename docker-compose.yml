@@ -8,7 +8,7 @@ services:
         GIT_COMMIT: ${GIT_COMMIT}
         GIT_VERSION: ${GIT_VERSION}
     ports:
-      - "5000:5000"
+      - "8000:8000"
     environment:
       - GOOGLE_SHEET_ID=${GOOGLE_SHEET_ID}
       - GOOGLE_CREDENTIALS_PATH=${GOOGLE_CREDENTIALS_PATH}
