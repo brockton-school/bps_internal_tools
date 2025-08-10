@@ -1,100 +1,82 @@
 import sqlite3
+from sqlalchemy import select, func
+from db import SessionLocal
+from models import Course, People, Enrollment
+from typing import List, Dict, Optional
 
-DB_PATH = '/app/data/canvas.db'
 
-def search_teacher_by_name(query, db_path=DB_PATH):
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+# Reusable predicate: real Canvas courses c + digits only (e.g., c003936)
+_COURSE_ID_REGEX = r'^c[0-9]+$'
 
-    cursor.execute('''
-        SELECT DISTINCT u.user_id, u.full_name
-        FROM users u
-        JOIN enrollments e ON u.user_id = e.user_id
-        WHERE e.role = 'teacher'
-          AND e.course_id GLOB 'c[0-9]*'
-          AND LOWER(u.full_name) LIKE LOWER(?)
-    ''', (f'%{query}%',))
+def search_teacher_by_name(query):
+    q = f"%{query.lower()}%"
+    with SessionLocal() as s:
+        rows = s.execute(
+            select(People.user_id, People.full_name)
+            .join(Enrollment, Enrollment.user_id == People.user_id)
+            .where(Enrollment.role == "teacher")
+            .where(Enrollment.course_id.like("c%"))
+            .where(People.full_name.ilike(q))
+        ).all()
+        # DISTINCT-like (SQLA 2.0 distinct over tuple is possible; or dedupe in Python)
+        seen, out = set(), []
+        for uid, name in rows:
+            if uid not in seen:
+                out.append({"user_id": uid, "full_name": name})
+                seen.add(uid)
+        return out
 
-    results = cursor.fetchall()
-    conn.close()
+def get_courses_for_user(user_id: str, role: str | None = None, terms: list[str] | None = None):
+    with SessionLocal() as s:
+        order_key = func.coalesce(Course.long_name, Course.short_name, Course.course_id)
 
-    return [{'user_id': user_id, 'full_name': full_name} for user_id, full_name in results]
+        stmt = (
+            select(Course.course_id, Course.short_name, Course.long_name)
+            .join(Enrollment, Enrollment.course_id == Course.course_id)
+            .where(Enrollment.user_id == user_id)
+            .where(Course.course_id.op('REGEXP')(r'^c[0-9]+$'))
+        )
+        if role:
+            stmt = stmt.where(Enrollment.role == role)
+        if terms:
+            stmt = stmt.where(Course.term_id.in_(terms))
 
-def get_courses_for_user(user_id, role=None, terms=None, db_path=DB_PATH):
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-
-    # Base query
-    query = '''
-        SELECT DISTINCT c.course_id, c.short_name, c.long_name
-        FROM enrollments e
-        JOIN courses c ON e.course_id = c.course_id
-        WHERE e.user_id = ?
-          AND e.course_id GLOB 'c[0-9]*'
-    '''
-    params = [user_id]
-
-    # Add role filter
-    if role:
-        query += ' AND e.role = ?'
-        params.append(role)
-
-    # Add term_id filter
-    if terms:
-        # Dynamically generate placeholders like (?, ?, ?) for term filtering
-        placeholders = ', '.join(['?'] * len(terms))
-        query += f' AND c.term_id IN ({placeholders})'
-        params.extend(terms)
-
-    cursor.execute(query, params)
-    results = cursor.fetchall()
-    conn.close()
+        rows = s.execute(stmt.distinct().order_by(order_key, Course.course_id)).all()
 
     return [
-        {
-            'course_id': course_id,
-            'short_name': short_name,
-            'long_name': long_name
-        }
-        for course_id, short_name, long_name in results
+        {"course_id": cid, "short_name": sname, "long_name": lname}
+        for (cid, sname, lname) in rows
     ]
 
 
-def get_students_in_course(course_id, db_path=DB_PATH):
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-
-    cursor.execute('''
-        SELECT DISTINCT u.user_id, u.full_name
-        FROM enrollments e
-        JOIN users u ON e.user_id = u.user_id
-        WHERE e.course_id = ?
-          AND e.role = 'student'
-    ''', (course_id,))
-
-    results = cursor.fetchall()
-    conn.close()
-
-    return [{'user_id': user_id, 'full_name': full_name} for user_id, full_name in results]
-
-def get_course_info(course_id: str, db_path=DB_PATH) -> dict:
+def get_students_in_course(course_id: str) -> List[Dict]:
     """
-    Returns the course long name and short name for the given course ID.
+    Return students (Canvas users) in a given course_id (user_id + full_name).
     """
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+    with SessionLocal() as s:
+        stmt = (
+            select(People.user_id, People.full_name)
+            .join(Enrollment, Enrollment.user_id == People.user_id)
+            .where(Enrollment.course_id == course_id)
+            .where(Enrollment.role == 'student')
+            .order_by(People.full_name)
+        )
+        rows = s.execute(stmt).all()
 
-    cursor.execute('''
-        SELECT long_name, short_name 
-        FROM courses 
-        WHERE course_id = ?
-    ''', (course_id,))
-    
-    result = cursor.fetchone()
-    cursor.close()
-    conn.close()
+    return [{"user_id": uid, "full_name": full} for (uid, full) in rows]
 
-    if result:
-        return {'long_name': result[0], 'short_name': result[1]}
-    else:
-        return {'long_name': 'Unknown Course', 'short_name': ''}
+def get_course_info(course_id: str) -> Dict:
+    """
+    Return {'short_name': ..., 'long_name': ...} for a course_id,
+    or sensible fallbacks if not found.
+    """
+    with SessionLocal() as s:
+        row = s.execute(
+            select(Course.short_name, Course.long_name)
+            .where(Course.course_id == course_id)
+        ).first()
+
+    if not row:
+        return {"short_name": "", "long_name": "Unknown Course"}
+    short, long_ = row
+    return {"short_name": short or "", "long_name": long_ or (short or "Unknown Course")}

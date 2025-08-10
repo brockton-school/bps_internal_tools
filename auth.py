@@ -2,45 +2,28 @@ import csv, os, tempfile, shutil
 from functools import wraps
 from flask import session, redirect, url_for, request, abort
 from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy import select, delete
+from db import SessionLocal
+from models import User, Role, RoleTool
 
-#USERS_CSV = os.getenv("AUTH_USERS_CSV", "auth_users.csv")  # path to your users file
-USERS_CSV = "/app/env/auth_users.csv"
-ROLES_CSV = "/app/env/auth_roles.csv"
+HASH_METHOD = "pbkdf2:sha256"
 
 # ---------- Loaders ----------
 def load_users():
-    users = {}
-    if os.path.exists(USERS_CSV):
-        with open(USERS_CSV, newline='', encoding='utf-8') as f:
-            r = csv.DictReader(f)
-            for row in r:
-                u = (row.get("username") or "").strip().lower()
-                if not u: continue
-                users[u] = {
-                    "username": u,
-                    "password_hash": (row.get("password_hash") or "").strip(),
-                    "display_name": (row.get("display_name") or u).strip(),
-                    "role": (row.get("role") or "user").strip(),
-                    "active": (row.get("active","true").strip().lower() != "false"),
-                }
-    return users
+    with SessionLocal() as s:
+        return {u.username: {
+            "username": u.username, "display_name": u.display_name,
+            "role": u.role_name, "active": u.active
+        } for u in s.execute(select(User)).scalars().all()}
 
 def load_roles():
-    roles = {}
-    if os.path.exists(ROLES_CSV):
-        with open(ROLES_CSV, newline='', encoding='utf-8') as f:
-            r = csv.DictReader(f)
-            for row in r:
-                name = (row.get("role") or "").strip()
-                if not name: continue
-                tools_raw = (row.get("tools") or "").strip()
-                tools = ["*"] if tools_raw == "*" else [t.strip() for t in tools_raw.split(",") if t.strip()]
-                roles[name] = {
-                    "role": name,
-                    "tools": tools,
-                    "active": (row.get("active","true").strip().lower() != "false"),
-                }
-    return roles
+    with SessionLocal() as s:
+        roles = {}
+        rows = s.execute(select(Role)).scalars().all()
+        for r in rows:
+            tool_rows = s.execute(select(RoleTool.tool_slug).where(RoleTool.role_id == r.id)).scalars().all()
+            roles[r.name] = {"role": r.name, "tools": tool_rows or [], "active": r.active}
+        return roles
 
 
 # ---------- Saves (atomic) ----------
@@ -86,22 +69,24 @@ def save_roles(roles):
 # ---------- Session / checks ----------
 
 def authenticate(username, password):
-    users = load_users()
-    u = users.get((username or "").lower())
-    if u and u["active"] and check_password_hash(u["password_hash"], password):
-        return {"username": u["username"], "display_name": u["display_name"], "role": u["role"]}
+    with SessionLocal() as s:
+        u = s.execute(select(User).where(User.username == username.lower())).scalar_one_or_none()
+        if u and u.active and check_password_hash(u.password_hash, password):
+            return {"username": u.username, "display_name": u.display_name, "role": u.role_name}
     return None
 
 def current_user():
     return session.get("user")
 
 def role_allows_tool(role_name, tool_slug):
-    roles = load_roles()
-    role = roles.get(role_name)
-    if not role or not role["active"]:
-        return False
-    tools = role.get("tools") or []
-    return ("*" in tools) or (tool_slug in tools)
+    with SessionLocal() as s:
+        role = s.execute(select(Role).where(Role.name == role_name, Role.active == True)).scalar_one_or_none()  # noqa
+        if not role: return False
+        # admin style: if role has '*' allow all
+        any_star = s.execute(select(RoleTool).where(RoleTool.role_id == role.id, RoleTool.tool_slug == "*")).first()
+        if any_star: return True
+        got = s.execute(select(RoleTool).where(RoleTool.role_id == role.id, RoleTool.tool_slug == tool_slug)).first()
+        return bool(got)
 
 def login_required(view):
     @wraps(view)
@@ -126,60 +111,67 @@ def tool_required(tool_slug):
 
 # ---------- Admin CRUD ----------
 def add_user(username, password, display_name, role, active=True):
-    username = username.strip().lower()
-    users = load_users()
-    if username in users:
-        raise ValueError("User already exists")
-    users[username] = {
-        "username": username,
-        "password_hash": generate_password_hash(password),
-        "display_name": display_name.strip() or username,
-        "role": role.strip() or "user",
-        "active": bool(active),
-    }
-    save_users(users)
+    with SessionLocal() as s:
+        if s.execute(select(User).where(User.username == username.lower())).first():
+            raise ValueError("User already exists")
+        s.add(User(
+            username=username.lower(),
+            password_hash=generate_password_hash(password, method=HASH_METHOD),
+            display_name=display_name or username,
+            role_name=role,
+            active=bool(active),
+        ))
+        s.commit()
 
 def update_user(username, display_name=None, role=None, active=None, new_password=None):
-    username = username.strip().lower()
-    users = load_users()
-    if username not in users:
-        raise ValueError("User not found")
-    if display_name is not None:
-        users[username]["display_name"] = display_name.strip() or username
-    if role is not None:
-        users[username]["role"] = role.strip() or "user"
-    if active is not None:
-        users[username]["active"] = bool(active)
-    if new_password:
-        users[username]["password_hash"] = generate_password_hash(new_password)
-    save_users(users)
+    with SessionLocal() as s:
+        u = s.execute(select(User).where(User.username == username.lower())).scalar_one_or_none()
+        if not u: raise ValueError("User not found")
+        if display_name is not None: u.display_name = display_name or u.username
+        if role is not None: u.role_name = role
+        if active is not None: u.active = bool(active)
+        if new_password: u.password_hash = generate_password_hash(new_password, method=HASH_METHOD)
+        s.commit()
 
 def delete_user(username):
-    username = username.strip().lower()
-    users = load_users()
-    if username in users:
-        users.pop(username)
-        save_users(users)
+    with SessionLocal() as s:
+        u = s.execute(select(User).where(User.username == username.lower())).scalar_one_or_none()
+        if u:
+            s.delete(u)
+            s.commit()
 
 def add_role(name, tools, active=True):
-    roles = load_roles()
-    if name in roles:
-        raise ValueError("Role already exists")
-    roles[name] = {"role": name, "tools": (["*"] if tools==["*"] else tools), "active": bool(active)}
-    save_roles(roles)
+    with SessionLocal() as s:
+        if s.execute(select(Role).where(Role.name == name)).first():
+            raise ValueError("Role already exists")
+        r = Role(name=name, active=bool(active))
+        s.add(r); s.flush()
+        if tools == ["*"]:
+            s.add(RoleTool(role_id=r.id, tool_slug="*"))
+        else:
+            for slug in tools or []:
+                s.add(RoleTool(role_id=r.id, tool_slug=slug))
+        s.commit()
+
 
 def update_role(name, tools=None, active=None):
-    roles = load_roles()
-    if name not in roles:
-        raise ValueError("Role not found")
-    if tools is not None:
-        roles[name]["tools"] = (["*"] if tools==["*"] else tools)
-    if active is not None:
-        roles[name]["active"] = bool(active)
-    save_roles(roles)
+    with SessionLocal() as s:
+        r = s.execute(select(Role).where(Role.name == name)).scalar_one_or_none()
+        if not r: raise ValueError("Role not found")
+        if active is not None: r.active = bool(active)
+        if tools is not None:
+            s.execute(delete(RoleTool).where(RoleTool.role_id == r.id))
+            if tools == ["*"]:
+                s.add(RoleTool(role_id=r.id, tool_slug="*"))
+            else:
+                for slug in tools:
+                    s.add(RoleTool(role_id=r.id, tool_slug=slug))
+        s.commit()
 
 def delete_role(name):
-    roles = load_roles()
-    if name in roles:
-        roles.pop(name)
-        save_roles(roles)
+    with SessionLocal() as s:
+        r = s.execute(select(Role).where(Role.name == name)).scalar_one_or_none()
+        if r:
+            s.execute(delete(RoleTool).where(RoleTool.role_id == r.id))
+            s.delete(r)
+            s.commit()
