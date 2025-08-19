@@ -56,3 +56,33 @@ document.addEventListener('change', (e)=>{
     }
   }
 });
+
+
+// Delete confimration tools... should probably go somewhere better...
+
+// Catch explicit clicks (still useful for older browsers / edge cases)
+document.addEventListener("click", function (e) {
+  const btn = e.target.closest(".confirm-delete");
+  if (!btn) return;
+
+  const label = btn.getAttribute("aria-label") || "this item";
+  if (!confirm(`Are you sure you want to delete ${label}? This cannot be undone.`)) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+});
+
+// Definitive guard: block form submission when the delete button is the submitter
+document.addEventListener("submit", function (e) {
+  // Modern browsers set e.submitter to the button that triggered submit
+  const submitter = e.submitter || document.activeElement;
+  if (!submitter) return;
+
+  if (submitter.classList && submitter.classList.contains("confirm-delete")) {
+    const label = submitter.getAttribute("aria-label") || "this item";
+    if (!confirm(`Are you sure you want to delete ${label}? This cannot be undone.`)) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+}, true); // useCapture=true ensures we run before default handlers
