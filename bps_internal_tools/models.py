@@ -32,6 +32,8 @@ class User(db.Model):
     display_name = Column(String(255), nullable=False)
     role_name = Column(String(64), ForeignKey("roles.name"), nullable=False)
     active = Column(Boolean, default=True, nullable=False)
+    auth_provider = Column(String(32), nullable=True)  # identifies log in source
+    canvas_user_id = Column(String(64), ForeignKey("users_canvas.user_id"), nullable=True)  # adds support for linking Google Users to Canvas
 
     
 # --- Canvas-like data ---

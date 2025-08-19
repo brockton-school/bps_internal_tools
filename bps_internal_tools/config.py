@@ -15,6 +15,11 @@ class BaseConfig:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
 
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+    OAUTH_REDIRECT_URI = os.getenv("OAUTH_REDIRECT_URI")  # https://.../auth/google/callback
+    ALLOWED_DOMAIN = os.getenv("ALLOWED_DOMAIN", "brocktonschool.com")
+
 class DevConfig(BaseConfig):
     DEBUG = True
 
