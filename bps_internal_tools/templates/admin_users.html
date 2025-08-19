@@ -24,31 +24,46 @@
   <h2 style="margin-top:0">Existing Users</h2>
   <div class="grid">
     {% for u in users %}
-    <div class="tile" style="flex-direction:column; align-items:stretch;">
-      <form method="post" action="{{ url_for('admin.update_user_route', username=u.username) }}">
-        <div><strong>{{ u.username }}</strong> {% if not u.active %}<span style="color:#ffa6a6;">(inactive)</span>{% endif %}</div>
-        <label style="margin-top:8px;">Display Name</label>
+    <div class="tile col">
+      <form method="post" action="{{ url_for('admin.update_user_route', username=u.username) }}" class="user-edit-form">
+        <div><strong>{{ u.username }}</strong> {% if not u.active %}<span class="text-warn">(inactive)</span>{% endif %}</div>
+
+        <label class="mt-8">Display Name</label>
         <input class="input" name="display_name" value="{{ u.display_name }}">
-        <label>Role</label>
+
+        <label class="mt-8">Role</label>
         <select class="input" name="role">
           {% for r in roles if r.active %}
           <option value="{{ r.role }}" {% if r.role == u.role %}selected{% endif %}>{{ r.role }}</option>
           {% endfor %}
         </select>
-        <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+
+        <label class="mt-8 inline">
           <input type="checkbox" name="active" {% if u.active %}checked{% endif %}> Active
         </label>
-        <label>New Password (optional)</label>
+
+        <label class="mt-8">New Password (optional)</label>
         <input class="input" type="password" name="new_password" placeholder="Leave blank to keep existing">
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button class="btn" type="submit" style="width:auto;">Save</button>
-          <form method="post" action="{{ url_for('admin.delete_user_route', username=u.username) }}" onsubmit="return confirm('Delete user {{u.username}}?')">
-            <button class="btn danger" type="submit" style="width:auto;">Delete</button>
-          </form>
+
+        <div class="row mt-10">
+          <button class="btn" type="submit">Save</button>
+
+          <!-- Delete submits to a different endpoint via formaction -->
+          <button
+            class="btn danger outline confirm-delete"
+            type="submit"
+            formmethod="post"
+            formaction="{{ url_for('admin.delete_user_route', username=u.username) }}"
+            formnovalidate
+            aria-label="Delete user {{ u.display_name }}"
+          >
+            Delete
+          </button>
         </div>
       </form>
     </div>
     {% endfor %}
+
   </div>
 </div>
 {% endblock %}

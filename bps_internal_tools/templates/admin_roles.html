@@ -60,11 +60,20 @@
           <input type="checkbox" name="active" {% if r.active %}checked{% endif %}> Active
         </label>
 
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button class="btn" type="submit" style="width:auto;">Save</button>
-          <form method="post" action="{{ url_for('admin.delete_role_route', role=r.role) }}" onsubmit="return confirm('Delete role {{r.role}}?')">
-            <button class="btn danger" type="submit" style="width:auto;">Delete</button>
-          </form>
+        <div class="row mt-10">
+          <button class="btn" type="submit">Save</button>
+
+          <!-- Delete submits to a different endpoint via formaction -->
+          <button
+            class="btn danger outline confirm-delete"
+            type="submit"
+            formmethod="post"
+            formaction="{{ url_for('admin.delete_role_route', role=r.role) }}"
+            formnovalidate
+            aria-label="Delete role {{ r.role }}"
+          >
+            Delete
+          </button>
         </div>
       </form>
     </div>
