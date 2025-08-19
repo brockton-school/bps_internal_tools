@@ -85,7 +85,7 @@ def login_required(view):
     @wraps(view)
     def wrapped(*a, **kw):
         if not session.get("user"):
-            return redirect(url_for("login", next=request.path))
+            return redirect(url_for("auth.login", next=request.path))
         return view(*a, **kw)
     return wrapped
 
@@ -95,7 +95,7 @@ def tool_required(tool_slug):
         def wrapped(*a, **kw):
             u = current_user()
             if not u:
-                return redirect(url_for("login", next=request.path))
+                return redirect(url_for("auth.login", next=request.path))
             if not role_allows_tool(u.get("role"), tool_slug):
                 abort(403)
             return view(*a, **kw)
