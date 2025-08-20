@@ -3,17 +3,31 @@ import sys
 from pathlib import Path
 from alembic import context
 from sqlalchemy import engine_from_config, pool
+import importlib.util
+import types
 
-from bps_internal_tools.extensions import db
-target_metadata = db.Model.metadata
-
-# Ensure project root is on sys.path, so 'bps_internal_tools' is importable
+# Ensure project root is on sys.path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
 
-# Now import ONLY models metadata (avoid importing create_app)
-from bps_internal_tools.models import Base  # <- has your declarative base
+# Create minimal package to satisfy relative imports
+pkg = types.ModuleType("bps_internal_tools")
+sys.modules["bps_internal_tools"] = pkg
+
+# Load extensions module
+ext_spec = importlib.util.spec_from_file_location(
+    "bps_internal_tools.extensions", PROJECT_ROOT / "bps_internal_tools" / "extensions.py"
+)
+extensions = importlib.util.module_from_spec(ext_spec)
+ext_spec.loader.exec_module(extensions)
+sys.modules["bps_internal_tools.extensions"] = extensions
+
+# Load models module
+models_spec = importlib.util.spec_from_file_location(
+    "bps_internal_tools.models", PROJECT_ROOT / "bps_internal_tools" / "models.py"
+)
+models = importlib.util.module_from_spec(models_spec)
+models_spec.loader.exec_module(models)
+Base = models.Base
 
 config = context.config
 # Let env variables drive the URL

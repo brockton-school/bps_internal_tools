@@ -66,6 +66,7 @@ class People(db.Model):
     email = Column(String(255))
     status = Column(String(64))
     pronouns = Column(String(255))
+    grade = Column(String(64))
 
 class Enrollment(db.Model):
     __tablename__ = "enrollments"

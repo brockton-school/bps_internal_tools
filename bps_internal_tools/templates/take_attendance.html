@@ -16,7 +16,7 @@
       <a class="btn" href="{{ url_for('toc.index') }}">Start Over</a>
     {% else %}
       <form method="post">
-        <label>Select any absent students</label>
+        <label>Select any students that are <b>ABSENT</b>.</label>
         <div class="grid">
           {% for s in students %}
             <label class="tile">
@@ -26,7 +26,7 @@
           {% endfor %}
         </div>
         <button class="btn" type="submit">Submit Attendance</button>
-        <a class="btn secondary" href="{{ url_for('toc.select_course', teacher_id=teacher_id) }}">Back</a>
+        <a class="btn secondary" href="{{ url_for('toc.select_course', teacher_id=teacher_id) if teacher_id else url_for('toc.index') }}">Back</a>
       </form>
     {% endif %}
   </div>

@@ -79,3 +79,34 @@ def get_course_info(course_id: str) -> Dict:
         return {"short_name": "", "long_name": "Unknown Course"}
     short, long_ = row
     return {"short_name": short or "", "long_name": long_ or (short or "Unknown Course")}
+
+
+def get_students_in_grade(grade: str) -> List[Dict]:
+    """Return students for a given grade."""
+    s = db.session
+    stmt = (
+        select(People.user_id, People.full_name)
+        .where(People.grade == grade)
+        .order_by(People.full_name)
+    )
+    rows = s.execute(stmt).all()
+    return [{"user_id": uid, "full_name": full} for (uid, full) in rows]
+
+
+def get_all_grades() -> List[str]:
+    """Return distinct grades present in users_canvas."""
+    s = db.session
+    rows = (
+        s.execute(
+            select(People.grade)
+            .where(People.grade.isnot(None))
+            .distinct()
+            .order_by(People.grade)
+        )
+        .scalars()
+        .all()
+    )
+    print(rows)
+    #return [g for g in numbers if g.isdigit()]
+    rows.sort()
+    return rows

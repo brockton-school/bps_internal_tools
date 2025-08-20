@@ -2,6 +2,15 @@
 {% block title %}Select Teacher · TOC Attendance{% endblock %}
 {% block content %}
   <div class="card">
+    <label>Select a grade</label>
+    <div class="grid">
+      {% for g in grades %}
+        <a class="btn" href="{{ url_for('toc.take_attendance_grade', grade=g) }}">{{ g }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card">
     <label for="q">Search for the teacher you’re covering</label>
     <div class="ac-wrap">
       <input id="q" class="input" type="text" placeholder="Start typing a name…" autocomplete="off" aria-autocomplete="list" aria-controls="ac" aria-expanded="false">
