@@ -280,6 +280,15 @@ label {
   background: rgba(186, 12, 47, .15);
 }
 
+.autocomplete { margin-top: 6px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.autocomplete:empty { display: none; }
+.ac-item { display: block; width: 100%; text-align: left; padding: 10px 12px; border: none; background: transparent; cursor: pointer; }
+.ac-item:hover, .ac-item:focus { background: var(--hover); outline: none; }
+.row.wrap { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn.small { padding: 6px 10px; font-size: 0.9rem; }
+.mt-12 { margin-top: 12px; }
+.fw-600 { font-weight: 600; }
+
 /* ===== Lists (students) ===== */
 .grid {
   display: grid;

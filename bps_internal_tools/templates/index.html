@@ -1,27 +1,49 @@
 {% extends "base.html" %}
-{% block title %}Select Teacher · TOC Attendance{% endblock %}
+{% block title %}TOC Attendance{% endblock %}
+
 {% block content %}
-  <div class="card">
-    <label for="q">Search for the teacher you’re covering</label>
-    <div class="ac-wrap">
-      <input id="q" class="input" type="text" placeholder="Start typing a name…" autocomplete="off" aria-autocomplete="list" aria-controls="ac" aria-expanded="false">
-      <div id="ac" class="ac-list" role="listbox"></div>
+<div class="page">
+  <h1 class="h3 m-0">TOC Attendance</h1>
+
+  <!-- Make endpoints available to the static JS via data-* -->
+  <div id="toc-config"
+       data-search-teachers="{{ url_for('toc.search_teachers') }}"
+       data-search-courses="{{ url_for('toc.search_courses') }}"
+       data-go-course="{{ url_for('toc.go_direct_course') }}"></div>
+
+  <!-- Shortcut buttons -->
+  {% if preset_courses %}
+  <div class="tile mt-12">
+    <div class="row wrap gap-8">
+      {% for pc in preset_courses %}
+      <a class="btn small"
+         href="{{ url_for('toc.go_direct_course', course_id=pc.course_id, course_name=pc.label) }}">
+        {{ pc.label }}
+      </a>
+      {% endfor %}
     </div>
-    <button id="clearBtn" class="btn secondary" type="button" style="display:none;">Clear</button>
-    <div id="searchMsg" class="notice" style="display:none;"></div>
   </div>
+  {% endif %}
+
+  <!-- Search by Teacher -->
+  <div class="tile mt-12">
+    <label class="fw-600">Search by Teacher</label>
+    <input id="teacher-search" class="input" placeholder="Start typing a teacher name…" autocomplete="off">
+    <div id="teacher-results" class="autocomplete"></div>
+  </div>
+
+  <!-- Search by Course -->
+  <div class="tile mt-12">
+    <label class="fw-600">Search by Course</label>
+    <input id="course-search" class="input" placeholder="Start typing a course name or ID…" autocomplete="off">
+    <div id="course-results" class="autocomplete"></div>
+  </div>
+</div>
 {% endblock %}
+
 {% block scripts %}
-<script src="{{ url_for('static', filename='app.js') }}"></script>
-<script>
-  setupTeacherSearch({
-    inputId: 'q',
-    listId: 'ac',
-    clearId: 'clearBtn',
-    searchUrl: '{{ url_for("toc.search_teachers") }}',
-    onPick: (teacher) => {
-      window.location.href = "{{ url_for('toc.select_course', teacher_id='__ID__') }}".replace('__ID__', encodeURIComponent(teacher.id));
-    }
-  });
-</script>
+  {{ super() }}
+  <script src="{{ url_for('static', filename='toc.js') }}" defer></script>
 {% endblock %}
+
+

@@ -79,3 +79,37 @@ def get_course_info(course_id: str) -> Dict:
         return {"short_name": "", "long_name": "Unknown Course"}
     short, long_ = row
     return {"short_name": short or "", "long_name": long_ or (short or "Unknown Course")}
+
+
+def search_courses_by_query(query: str, terms: Optional[List[str]] = None, limit: int = 12) -> List[Dict]:
+    """Search courses by partial match on short_name, long_name, or course_id.
+       Only returns real Canvas course_ids that match c000000… pattern."""
+    if not query:
+        return []
+
+    q = f"%{query.strip()}%"
+    stmt = (
+        select(Course.course_id, Course.short_name, Course.long_name, Course.term_id)
+        .where(Course.course_id.op("REGEXP")(_COURSE_ID_REGEX))
+        .where(
+            or_(
+                Course.short_name.ilike(q),
+                Course.long_name.ilike(q),
+                Course.course_id.ilike(q),
+            )
+        )
+    )
+    if terms:
+        stmt = stmt.where(Course.term_id.in_(terms))
+
+    order_key = func.coalesce(Course.long_name, Course.short_name, Course.course_id)
+    rows = db.session.execute(stmt.order_by(order_key, Course.course_id).limit(limit)).all()
+    return [
+        {
+            "course_id": cid,
+            "short_name": s or "",
+            "long_name": l or (s or ""),
+            "term_id": t or "",
+        }
+        for (cid, s, l, t) in rows
+    ]
