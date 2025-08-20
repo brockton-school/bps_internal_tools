@@ -87,7 +87,16 @@ def replace_enrollments(session: Session, df: pd.DataFrame) -> None:
         return
 
     session.execute(delete(Enrollment))
-    rows = df.where(pd.notnull(df), None).to_dict(orient="records")
+
+    # ``bulk_insert_mappings`` can't handle NaN values – they must be converted
+    # to ``None`` so SQLAlchemy can emit proper ``NULL`` values.  Using
+    # ``DataFrame.where`` isn't sufficient for numeric columns because pandas
+    # will coerce ``None`` back to ``NaN`` when the dtype is float, so we build
+    # the row dictionaries manually and filter with :func:`pd.isna`.
+    rows = []
+    for _, row in df.iterrows():
+        rows.append({k: (None if pd.isna(v) else v) for k, v in row.items()})
+
     if rows:
         session.bulk_insert_mappings(Enrollment, rows)
     session.commit()
