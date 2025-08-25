@@ -1,7 +1,15 @@
 from flask import render_template, request, redirect, url_for
 from bps_internal_tools.services.auth import login_required, current_user, tool_required
 from . import toc_bp, TOOL_SLUG
-from bps_internal_tools.services.queries import search_teacher_by_name, get_courses_for_user, get_students_in_course, get_course_info
+from bps_internal_tools.services.queries import (
+    search_teacher_by_name,
+    get_courses_for_user,
+    get_students_in_course,
+    get_students_in_grade_section,
+    get_course_info,
+    get_grade_sections,
+    get_grade_section
+)
 from bps_internal_tools.services.sheets import log_attendance
 from bps_internal_tools.config import DEFAULT_TERMS
 
@@ -17,10 +25,15 @@ def home():
 @login_required
 @tool_required(TOOL_SLUG)
 def index():
-    return render_template("index.html",
-                           page_title="TOC Attendance",
-                           page_subtitle="Simple attendance form for senior school coverage.",
-                           active_tool="TOC Attendance")
+    grade_sections = get_grade_sections()
+    print(grade_sections)
+    return render_template(
+        "index.html",
+        grade_sections=grade_sections,
+        page_title="TOC Attendance",
+        page_subtitle="Simple attendance form class coverage.",
+        active_tool="TOC Attendance",
+    )
 
 @toc_bp.route("/search-teachers")
 @login_required
@@ -77,3 +90,38 @@ def take_attendance(course_id):
                            page_title="TOC Attendance",
                            page_subtitle="Simple attendance form for senior school coverage.",
                            active_tool="TOC Attendance")
+
+@toc_bp.route("/grade/<int:grade_section_id>", methods=["GET", "POST"])
+@login_required
+@tool_required(TOOL_SLUG)
+def take_attendance_grade(grade_section_id):
+    students = get_students_in_grade_section(grade_section_id)
+    section = get_grade_section(grade_section_id)
+    course_name = section["display_name"] if section else "Unknown Grade"
+
+    if request.method == "POST":
+        absent_ids = request.form.getlist("absent")
+        absent_students = [s for s in students if str(s["user_id"]) in absent_ids]
+        submitter = current_user().get("display_name") or current_user().get("username")
+        log_attendance(absent_students, course_name, submitted_by=submitter)
+        return render_template(
+            "take_attendance.html",
+            students=students,
+            submitted=True,
+            absent_ids=absent_ids,
+            course_name=course_name,
+            teacher_id=None,
+            page_title="TOC Attendance",
+            page_subtitle="Simple attendance form for senior school coverage.",
+            active_tool="TOC Attendance",
+        )
+    return render_template(
+        "take_attendance.html",
+        students=students,
+        submitted=False,
+        course_name=course_name,
+        teacher_id=None,
+        page_title="TOC Attendance",
+        page_subtitle="Simple attendance form for senior school coverage.",
+        active_tool="TOC Attendance",
+    )

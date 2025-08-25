@@ -1,6 +1,17 @@
 from flask import render_template, request, redirect, url_for, flash
-from bps_internal_tools.services.auth import load_users, load_roles, add_user, update_user, delete_user, add_role, update_role, delete_role, tool_required
+from bps_internal_tools.services.auth import (
+    load_users, 
+    load_roles, 
+    add_user, 
+    update_user, 
+    delete_user, 
+    add_role, 
+    update_role, 
+    delete_role, 
+    tool_required)
 from bps_internal_tools.tools_registry import all_tools, tool_slugs
+from bps_internal_tools.models import GradeSection
+from bps_internal_tools.extensions import db
 from . import admin_bp, TOOL_SLUG
 
 @admin_bp.route("/settings", methods=["GET"])
@@ -113,3 +124,58 @@ def delete_user_route(username):
     delete_user(username)
     flash(f"User '{username}' deleted", "ok")
     return redirect(url_for("admin.users_page"))
+
+
+# --- Grade Sections page ---
+@admin_bp.route("/settings/grade_sections", methods=["GET"])
+@tool_required(TOOL_SLUG)
+def grade_sections_page():
+    sections = GradeSection.query.order_by(GradeSection.display_name).all()
+    return render_template(
+        "admin_grade_sections.html",
+        sections=sections,
+        page_title="Admin · Grade Sections",
+        page_subtitle="Manage grade sections",
+        active_tool="Settings",
+    )
+
+
+@admin_bp.route("/settings/grade_sections/create", methods=["POST"])
+@tool_required(TOOL_SLUG)
+def create_grade_section_route():
+    display_name = (request.form.get("display_name") or "").strip()
+    school_level = (request.form.get("school_level") or "").strip()
+    reference_course_id = (request.form.get("reference_course_id") or "").strip()
+    if not display_name:
+        flash("Display name is required", "error"); return redirect(url_for("admin.grade_sections_page"))
+    section = GradeSection(
+        display_name=display_name,
+        school_level=school_level or None,
+        reference_course_id=reference_course_id or None,
+    )
+    db.session.add(section)
+    db.session.commit()
+    flash(f"Grade section '{display_name}' created", "ok")
+    return redirect(url_for("admin.grade_sections_page"))
+
+
+@admin_bp.route("/settings/grade_sections/update/<int:section_id>", methods=["POST"])
+@tool_required(TOOL_SLUG)
+def update_grade_section_route(section_id):
+    section = GradeSection.query.get_or_404(section_id)
+    section.display_name = (request.form.get("display_name") or "").strip()
+    section.school_level = (request.form.get("school_level") or "").strip() or None
+    section.reference_course_id = (request.form.get("reference_course_id") or "").strip() or None
+    db.session.commit()
+    flash(f"Grade section '{section.display_name}' updated", "ok")
+    return redirect(url_for("admin.grade_sections_page"))
+
+
+@admin_bp.route("/settings/grade_sections/delete/<int:section_id>", methods=["POST"])
+@tool_required(TOOL_SLUG)
+def delete_grade_section_route(section_id):
+    section = GradeSection.query.get_or_404(section_id)
+    db.session.delete(section)
+    db.session.commit()
+    flash(f"Grade section '{section.display_name}' deleted", "ok")
+    return redirect(url_for("admin.grade_sections_page"))

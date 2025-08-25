@@ -66,6 +66,7 @@ class People(db.Model):
     email = Column(String(255))
     status = Column(String(64))
     pronouns = Column(String(255))
+    grade = Column(String(64))
 
 class Enrollment(db.Model):
     __tablename__ = "enrollments"
@@ -79,3 +80,10 @@ class Enrollment(db.Model):
     associated_user_id = Column(String(64))
     limit_section_privileges = Column(String(16))
     temporary_enrollment_source_user_id = Column(String(64))
+
+class GradeSection(db.Model):
+    __tablename__ = "grade_sections"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    display_name = Column(String(255), unique=True, nullable=False)
+    school_level = Column(String(64))
+    reference_course_id = Column(String(32), ForeignKey("courses.course_id", ondelete="SET NULL"))
