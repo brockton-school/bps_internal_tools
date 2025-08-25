@@ -32,13 +32,21 @@
 
 <div class="card" style="margin-top:16px;">
   <h2 style="margin-top:0">Existing Roles</h2>
-  <div class="grid">
-    {% for r in roles %}
-    <div class="tile" style="flex-direction:column; align-items:stretch;">
-      <form method="post" action="{{ url_for('admin.update_role_route', role=r.role) }}">
-        <div><strong>{{ r.role }}</strong> {% if not r.active %}<span style="color:#ffa6a6;">(inactive)</span>{% endif %}</div>
-        <div style="margin-top:8px;">
-          <div style="color:var(--muted); margin-bottom:6px;">Tools</div>
+  <table class="table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Tools</th>
+          <th>Active</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in roles %}
+        <form method="post" action="{{ url_for('admin.update_role_route', role=r.role) }}" class="row-form">
+        <tr>
+          <td><strong>{{ r.role }}</strong> {% if not r.active %}<span style="color:#ffa6a6;">(inactive)</span>{% endif %}</td>
+          <td>
           <div class="grid">
             {% set allowed = r.tools %}
             {% for t in tools %}
@@ -54,30 +62,27 @@
               <span>All Tools</span>
             </label>
           </div>
-        </div>
-
-        <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-          <input type="checkbox" name="active" {% if r.active %}checked{% endif %}> Active
-        </label>
-
-        <div class="row mt-10">
-          <button class="btn" type="submit">Save</button>
-
-          <!-- Delete submits to a different endpoint via formaction -->
-          <button
-            class="btn danger outline confirm-delete"
-            type="submit"
-            formmethod="post"
-            formaction="{{ url_for('admin.delete_role_route', role=r.role) }}"
-            formnovalidate
-            aria-label="Delete role {{ r.role }}"
-          >
-            Delete
-          </button>
-        </div>
+        </td>
+        <td style="text-align:center;">
+          <input type="checkbox" name="active" {% if r.active %}checked{% endif %}>
+        </td>
+        <td>
+          <div class="row">
+            <button class="btn" type="submit">Save</button>
+            <button
+              class="btn danger outline confirm-delete"
+              type="submit"
+              formmethod="post"
+              formaction="{{ url_for('admin.delete_role_route', role=r.role) }}"
+              formnovalidate
+              aria-label="Delete role {{ r.role }}"
+            >Delete</button>
+          </div>
+        </td>
+      </tr>
       </form>
-    </div>
-    {% endfor %}
-  </div>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

@@ -15,7 +15,10 @@
     <!-- Top App Bar -->
     <header class="topbar">
       <div class="topbar-left">
-        <a class="brand" href="{{ url_for('tools_index') }}" aria-label="Brockton Tools Home">B</a>
+        <a class="brand" href="{{ url_for('tools_index') }}" aria-label="Brockton Tools Home">
+          <img src="{{ url_for('static', filename='bps-crest_WHITE.png') }}" alt="Brockton Public Schools crest" class="logo-dark">
+          <img src="{{ url_for('static', filename='bps-crest.png') }}" alt="Brockton Public Schools crest" class="logo-light">
+        </a>
         <div class="titles">
           <h1 class="app-title">
             {% if active_tool %}{{ active_tool }}{% else %}Brockton School Internal Tools{% endif %}
@@ -35,7 +38,7 @@
         <div class="user-menu">
           <button class="avatar-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false" title="{{ auth_user.display_name or auth_user.username }}">
             <span class="avatar-initials">
-              {{ (auth_user.display_name or auth_user.username)[:1] | upper }}
+              {{ (auth_user.display_name or auth_user.username) | initials }}
             </span>
           </button>
           <div class="menu" id="userDropdown" role="menu" aria-labelledby="userMenuBtn">
