@@ -16,6 +16,7 @@
       <a class="btn" href="{{ url_for('toc.index') }}">Start Over</a>
     {% else %}
       <form method="post">
+        <input type="hidden" name="block" value="{{ block }}">
         <label>Select any students that are <b>ABSENT</b>.</label>
         <div class="grid">
           {% for s in students %}

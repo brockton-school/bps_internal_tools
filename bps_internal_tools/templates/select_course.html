@@ -10,6 +10,14 @@
           <option value="{{ c.course_id }}">{{ c.short_name }} — {{ c.long_name }}</option>
         {% endfor %}
       </select>
+
+      <label for="block">Which block is this course in?</label>
+      <select id="block" name="block" required>
+        {% for i in range(1,7) %}
+          <option value="{{ i }}">Block {{ i }}</option>
+        {% endfor %}
+      </select>
+
       <button class="btn" type="submit">Continue to Attendance</button>
       <a class="btn secondary" href="{{ url_for('toc.index') }}">Back</a>
     </form>
