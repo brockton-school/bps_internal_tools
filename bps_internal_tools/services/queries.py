@@ -50,7 +50,7 @@ def get_courses_for_user(user_id: str, role: str | None = None, terms: list[str]
 
 def get_students_in_course(course_id: str) -> List[Dict]:
     """
-    Return students (Canvas users) in a given course_id (user_id + full_name).
+    Return active students (Canvas users) in a given course_id (user_id + full_name).
     """
     s = db.session
     stmt = (
@@ -58,6 +58,7 @@ def get_students_in_course(course_id: str) -> List[Dict]:
         .join(Enrollment, Enrollment.user_id == People.user_id)
         .where(Enrollment.course_id == course_id)
         .where(Enrollment.role == 'student')
+        .where(People.status == 'active')
         .order_by(People.full_name)
     )
     rows = s.execute(stmt).all()
@@ -126,7 +127,7 @@ def get_grade_section(section_id: int) -> Optional[Dict]:
     }
 
 def get_students_in_grade_section(section_id: int) -> List[Dict]:
-    """Return students for a given grade section."""
+    """Return active students for a given grade section."""
     info = get_grade_section(section_id)
     if not info or not info["reference_course_id"]:
         return []
@@ -137,6 +138,7 @@ def get_students_in_grade_section(section_id: int) -> List[Dict]:
         .join(Enrollment, Enrollment.user_id == People.user_id)
         .where(Enrollment.course_id == course_id)
         .where(Enrollment.role == 'student')
+        .where(People.status == 'active')
         .order_by(People.full_name)
     )
     rows = s.execute(stmt).all()
