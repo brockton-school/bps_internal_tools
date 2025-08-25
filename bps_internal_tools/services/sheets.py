@@ -19,11 +19,18 @@ def get_or_create_today_tab():
     except gspread.exceptions.WorksheetNotFound:
         ws = sheet.add_worksheet(title=today_name, rows="500", cols="10")
         # Header
-        headers = ["Date", "Time", "Absent Students", "Course Name", "Submitted By"]
+        headers = [
+            "Date",
+            "Time",
+            "Absent Students",
+            "Course Name",
+            "Course Teachers",
+            "Submitted By",
+        ]
         ws.insert_row(headers, 1)
         # Freeze header
         ws.freeze(rows=1)
-        # Widen C, D, E
+        # Widen C, D, E, F
         spreadsheet_id = sheet.id
         requests = [
             {
@@ -43,6 +50,13 @@ def get_or_create_today_tab():
             {
                 "updateDimensionProperties": {
                     "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 4, "endIndex": 5},
+                    "properties": {"pixelSize": 260},
+                    "fields": "pixelSize"
+                }
+            },
+            {
+                "updateDimensionProperties": {
+                    "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 5, "endIndex": 6},
                     "properties": {"pixelSize": 200},
                     "fields": "pixelSize"
                 }
@@ -50,15 +64,15 @@ def get_or_create_today_tab():
         ]
         sheet.batch_update({"requests": requests})
         # Bold header
-        format_cell_range(ws, "A1:E1", CellFormat(textFormat=TextFormat(bold=True)))
+        format_cell_range(ws, "A1:F1", CellFormat(textFormat=TextFormat(bold=True)))
     return ws
 
 
 def bold_row(worksheet, row_number):
     fmt = CellFormat(textFormat=TextFormat(bold=True))
-    format_cell_range(worksheet, f'A{row_number}:D{row_number}', fmt)
+    format_cell_range(worksheet, f'A{row_number}:F{row_number}', fmt)
 
-def log_attendance(absent_students, course_name, submitted_by):
+def log_attendance(absent_students, course_name, teachers, submitted_by):
     ws = get_or_create_today_tab()
     now = datetime.now()
     date_str = now.strftime("%Y-%m-%d")
@@ -66,15 +80,16 @@ def log_attendance(absent_students, course_name, submitted_by):
 
     rows = []
     # Bold course line (we'll keep it for readability)
-    ws.append_row([course_name, "", "", "", ""], value_input_option="RAW")
+    ws.append_row([course_name, "", "", "", "", ""], value_input_option="RAW")
     # Make the last row bold:
     last = len(ws.get_all_values())
     format_cell_range(ws, f"A{last}:A{last}", CellFormat(textFormat=TextFormat(bold=True)))
 
+    teachers_str = ", ".join(teachers) if teachers else ""
     if absent_students:
         for s in absent_students:
-            rows.append([date_str, time_str, s["full_name"], course_name, submitted_by])
+            rows.append([date_str, time_str, s["full_name"], course_name, teachers_str, submitted_by])
     else:
-        rows.append([date_str, time_str, "All Students Present", course_name, submitted_by])
+        rows.append([date_str, time_str, "All Students Present", course_name, teachers_str, submitted_by])
 
     ws.append_rows(rows, value_input_option="RAW")

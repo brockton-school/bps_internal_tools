@@ -6,6 +6,7 @@ from bps_internal_tools.services.queries import (
     get_courses_for_user,
     get_students_in_course,
     get_students_in_grade_section,
+    get_teachers_in_course,
     get_course_info,
     get_grade_sections,
     get_grade_section
@@ -67,12 +68,13 @@ def take_attendance(course_id):
     info = get_course_info(course_id) # returns {'short_name':..., 'long_name':...}
     course_name = info.get("long_name") or info.get("short_name") or "Unknown Course"
     teacher_id = request.args.get("teacher_id") # passed via redirect above
+    teachers = [t["full_name"] for t in get_teachers_in_course(course_id)]
 
     if request.method == "POST":
         absent_ids = request.form.getlist("absent")
         absent_students = [s for s in students if str(s["user_id"]) in absent_ids]
         submitter = current_user().get("display_name") or current_user().get("username")
-        log_attendance(absent_students, course_name, submitted_by=submitter)
+        log_attendance(absent_students, course_name, teachers, submitted_by=submitter)
         return render_template("take_attendance.html",
                                students=students,
                                submitted=True,
@@ -104,6 +106,7 @@ def take_attendance_grade(grade_section_id):
         absent_students = [s for s in students if str(s["user_id"]) in absent_ids]
         submitter = current_user().get("display_name") or current_user().get("username")
         log_attendance(absent_students, course_name, submitted_by=submitter)
+        log_attendance(absent_students, course_name, [], submitted_by=submitter)
         return render_template(
             "take_attendance.html",
             students=students,

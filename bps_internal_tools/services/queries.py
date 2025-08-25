@@ -64,6 +64,21 @@ def get_students_in_course(course_id: str) -> List[Dict]:
 
     return [{"user_id": uid, "full_name": full} for (uid, full) in rows]
 
+def get_teachers_in_course(course_id: str) -> List[Dict]:
+    """Return teachers (Canvas users) in a given course."""
+    s = db.session
+    stmt = (
+        select(People.user_id, People.full_name)
+        .join(Enrollment, Enrollment.user_id == People.user_id)
+        .where(Enrollment.course_id == course_id)
+        .where(Enrollment.role == "teacher")
+        .order_by(People.full_name)
+    )
+    rows = s.execute(stmt).all()
+
+    return [{"user_id": uid, "full_name": full} for (uid, full) in rows]
+
+
 def get_course_info(course_id: str) -> Dict:
     """
     Return {'short_name': ..., 'long_name': ...} for a course_id,
