@@ -4,8 +4,8 @@
   <div class="card">
     <label>Select a grade</label>
     <div class="grid">
-      {% for g in grades %}
-        <a class="btn" href="{{ url_for('toc.take_attendance_grade', grade=g) }}">{{ g }}</a>
+      {% for g in grade_sections %}
+        <a class="btn" href="{{ url_for('toc.take_attendance_grade', grade_section_id=g.id) }}">{{ g.display_name }}</a>
       {% endfor %}
     </div>
   </div>

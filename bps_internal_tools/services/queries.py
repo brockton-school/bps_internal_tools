@@ -1,5 +1,5 @@
 from sqlalchemy import select, func
-from bps_internal_tools.models import Course, People, Enrollment
+from bps_internal_tools.models import Course, People, Enrollment, GradeSection
 from typing import List, Dict, Optional
 from bps_internal_tools.extensions import db 
 
@@ -80,33 +80,52 @@ def get_course_info(course_id: str) -> Dict:
     short, long_ = row
     return {"short_name": short or "", "long_name": long_ or (short or "Unknown Course")}
 
+def get_grade_sections() -> List[Dict]:
+    """Return all grade sections."""
+    s = db.session
+    rows = s.execute(
+        select(GradeSection.id, GradeSection.display_name)
+        .order_by(GradeSection.display_name)
+    ).all()
+    return [{"id": gid, "display_name": name} for gid, name in rows]
 
-def get_students_in_grade(grade: str) -> List[Dict]:
-    """Return students for a given grade."""
+def get_grade_section(section_id: int) -> Optional[Dict]:
+    """Return a grade section by id."""
+    s = db.session
+    row = s.execute(
+        select(
+            GradeSection.id,
+            GradeSection.display_name,
+            GradeSection.school_level,
+            GradeSection.reference_course_id,
+        ).where(GradeSection.id == section_id)
+    ).first()
+    if not row:
+        return None
+    gid, name, level, course_id = row
+    return {
+        "id": gid,
+        "display_name": name,
+        "school_level": level,
+        "reference_course_id": course_id,
+    }
+
+def get_students_in_grade_section(section_id: int) -> List[Dict]:
+    """Return students for a given grade section."""
+    info = get_grade_section(section_id)
+    if not info or not info["reference_course_id"]:
+        return []
+    course_id = info["reference_course_id"]
     s = db.session
     stmt = (
         select(People.user_id, People.full_name)
-        .where(People.grade == grade)
+        .join(Enrollment, Enrollment.user_id == People.user_id)
+        .where(Enrollment.course_id == course_id)
+        .where(Enrollment.role == 'student')
         .order_by(People.full_name)
     )
     rows = s.execute(stmt).all()
     return [{"user_id": uid, "full_name": full} for (uid, full) in rows]
 
 
-def get_all_grades() -> List[str]:
-    """Return distinct grades present in users_canvas."""
-    s = db.session
-    rows = (
-        s.execute(
-            select(People.grade)
-            .where(People.grade.isnot(None))
-            .distinct()
-            .order_by(People.grade)
-        )
-        .scalars()
-        .all()
-    )
-    print(rows)
-    #return [g for g in numbers if g.isdigit()]
-    rows.sort()
-    return rows
+
