@@ -19,31 +19,37 @@
 
 <div class="card" style="margin-top:16px;">
   <h2 style="margin-top:0">Existing Grade Sections</h2>
-  <div class="grid">
-    {% for s in sections %}
-    <div class="tile" style="flex-direction:column; align-items:stretch;">
-      <form method="post" action="{{ url_for('admin.update_grade_section_route', section_id=s.id) }}">
-        <label>Display Name</label>
-        <input class="input" name="display_name" value="{{ s.display_name }}">
-        <label>School Level</label>
-        <input class="input" name="school_level" value="{{ s.school_level or '' }}">
-        <label>Reference Course ID</label>
-        <input class="input" name="reference_course_id" value="{{ s.reference_course_id or '' }}">
-        <div class="row mt-10">
-          <button class="btn" type="submit">Save</button>
-          <button
-            class="btn danger outline confirm-delete"
-            type="submit"
-            formaction="{{ url_for('admin.delete_grade_section_route', section_id=s.id) }}"
-            formnovalidate
-            aria-label="Delete grade section {{ s.display_name }}"
-          >
-            Delete
-          </button>
-        </div>
-      </form>
-    </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Display Name</th>
+        <th>School Level</th>
+        <th>Reference Course ID</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in sections %}
+      <form method="post" action="{{ url_for('admin.update_grade_section_route', section_id=s.id) }}" class="row-form">
+      <tr>
+        <td><input class="input" name="display_name" value="{{ s.display_name }}"></td>
+        <td><input class="input" name="school_level" value="{{ s.school_level or '' }}"></td>
+        <td><input class="input" name="reference_course_id" value="{{ s.reference_course_id or '' }}"></td>
+        <td>
+          <div class="row">
+            <button class="btn" type="submit">Save</button>
+            <button
+              class="btn danger outline confirm-delete"
+              type="submit"
+              formaction="{{ url_for('admin.delete_grade_section_route', section_id=s.id) }}"
+              formnovalidate
+              aria-label="Delete grade section {{ s.display_name }}"
+            >Delete</button>
+          </div>
+        </td>
+      </tr>
     {% endfor %}
-  </div>
+    </tbody>
+  </table>
 </div>
 {% endblock %}

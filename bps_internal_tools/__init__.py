@@ -60,6 +60,15 @@ def create_app(config_name=None):
             "copyright_text": "© 2025 Brockton School. All rights reserved."
         }
     
+    @app.template_filter("initials")
+    def initials(name: str) -> str:
+        if not name:
+            return ""
+        parts = name.split()
+        if len(parts) == 1:
+            return parts[0][:2].upper()
+        return "".join(p[0] for p in parts[:2]).upper()
+    
     from sqlalchemy import text
     @app.route("/health")
     def health():
