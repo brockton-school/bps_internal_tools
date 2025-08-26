@@ -6,19 +6,30 @@ Currently includes the **TOC Attendance** tool (substitute teacher attendance) a
 
 The main drive for this project is to have somewhere clean and prebuilt that I can add new project requests to. This should save time in rebuilding main app infrastructure like data handling and authentication for every project. Instead that is all provided here and new project can just add to it. In theory this should make projects like cleaning up the sign in system or building a course selction app much easier.
 
+## 🆕 Recent Updates
+
+- Migrated persistence layer to **MariaDB** with import scripts for Canvas SIS CSVs
+- Added **Google Workspace OAuth** login alongside local CSV credentials
+- Introduced role-based access control with per-tool permissions
+- Expanded TOC Attendance with block selection, grade-level attendance, teacher logging, and inactive student filtering
+- Updated UI colours and branding with BPS logo files
+
 ## ✨ Features
 
 - **Internal Tools Hub** at `/` with per-tool namespaces
 - **TOC Attendance** at `/toc-attendance`:
   - Search teachers (autocomplete)
-  - Pick a course (term/role filtered)
+  - Pick a course (term/role filtered) and optional block
+  - Take attendance by course or by grade
+  - Filter out inactive students
+  - Log regular teacher names for context
   - Mark absences (touch-friendly UI)
   - Log results to Google Sheets (daily tab, header row, column widths)
   - Records **Submitted By** (logged-in user)
 - **Auth**
-  - CSV-based login (hashed passwords via Werkzeug)
+  - Local CSV credentials and Google Workspace OAuth for `brocktonschool.com`
   - Session-based `@login_required` protection
-  - Upgrade path to **Google Workspace OAuth**
+  - Role-based access control per tool
 
 Eventually more tools will be built here. The sign in app will be transfered to this project, and once a UI is built, the Canvas<->MySchool Data migration project will also be moved here.
 
@@ -28,7 +39,7 @@ Eventually more tools will be built here. The sign in app will be transfered to 
 - **Blueprints**
   - `toc_attendance/` → routes under `/toc-attendance`
 - **Data**
-  - SQLite for direct Canvas CSV imports (courses, users, enrollments from Canvas SIS Export)
+  - MariaDB/MySQL backend with scripts to import Canvas SIS CSVs
 - **Sheets**
   - Google Sheets logging (via `gspread` + `gspread-formatting`), eventually this should be moved to our own interface.
 
@@ -62,7 +73,7 @@ bps\_internal\_tools/
 ### 1) Requirements
 - Python 3.10+
 - Google service account creds for Sheets (JSON)
-- SQLite DB (created from Canvas Data CSVs)
+- MariaDB/MySQL database
 
 ### 2) Clone Repo
 ```bash
@@ -76,7 +87,7 @@ Create `.env` (or export env vars):
 ```bash
 cp .env.example .env
 ```
-Then update as needed.
+Then update as needed (set `DATABASE_URL`, Google OAuth credentials, etc.).
 
 Create `auth_users.csv`:
 
@@ -95,12 +106,12 @@ print(generate_password_hash("YOUR_PASSWORD"))
 PY
 ```
 
-### 4) Initialize DB from CSVs (example)
+### 4) Import Canvas CSVs
 
-Get SIS file from canvas, store them in `./data` and the script below. This should be cleaned up into a settings UI eventually!
+Place Canvas SIS export files under `./env/sis_export` and run:
 
 ```bash
-python scripts/import_to_sqlite.py
+python scripts/update-db-from-canvas.py
 ```
 
 ### 5) Run
@@ -116,9 +127,9 @@ Open: `http://localhost:5000/`
 
 ## 🔐 Authentication
 
-* CSV-backed users via `auth.py`
-* `@login_required` protects app routes
-* Future: swap in Google Workspace OAuth; keep `current_user()` shape to avoid rewrites
+* Local CSV users or Google Workspace OAuth restricted to `brocktonschool.com`
+* `@login_required` and role checks protect app routes
+* `current_user()` helper keeps a consistent shape across auth methods
 
 ## 🗒️ TOC Attendance → Google Sheets
 
@@ -130,7 +141,7 @@ Open: `http://localhost:5000/`
 ## 🖌️ UI/Branding
 
 * **Nunito Sans** (Google Fonts)
-* Brand red `#ba0c2f`
+* BPS colour palette and logo assets
 * Dark/light themes (toggle in avatar menu)
 * Accessible, touch-friendly controls
 
