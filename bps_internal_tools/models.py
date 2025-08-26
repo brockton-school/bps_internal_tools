@@ -81,6 +81,8 @@ class Enrollment(db.Model):
     limit_section_privileges = Column(String(16))
     temporary_enrollment_source_user_id = Column(String(64))
 
+
+# ------ A Simple Proxy to Set A Course as the Source of Truth for a Given Grade -------
 class GradeSection(db.Model):
     __tablename__ = "grade_sections"
     id = Column(Integer, primary_key=True, autoincrement=True)
