@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2 style="margin-top:0">Custom Users</h2>
+  <table class="table">
+    <thead>
+      <tr><th>User ID</th><th>Name</th><th>Email</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.user_id }}</td>
+        <td>{{ u.full_name }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.status }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h3 style="margin-top:0">Add or Update User</h3>
+  <form method="post">
+    <label>User ID</label>
+    <input class="input" type="text" name="user_id" placeholder="User ID" required>
+    <label>First Name</label>
+    <input class="input" type="text" name="first_name" placeholder="First Name">
+    <label>Last Name</label>
+    <input class="input" type="text" name="last_name" placeholder="Last Name">
+    <label>Email</label>
+    <input class="input" type="email" name="email" placeholder="Email">
+    <label>Status</label>
+    <input class="input" type="text" name="status" value="active">
+    <button class="btn" type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}
