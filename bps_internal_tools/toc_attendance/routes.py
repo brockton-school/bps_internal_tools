@@ -27,7 +27,6 @@ def home():
 @tool_required(TOOL_SLUG)
 def index():
     grade_sections = get_grade_sections()
-    print(grade_sections)
     return render_template(
         "index.html",
         grade_sections=grade_sections,
@@ -112,15 +111,37 @@ def take_attendance(course_id):
 @login_required
 @tool_required(TOOL_SLUG)
 def take_attendance_grade(grade_section_id):
-    students = get_students_in_grade_section(grade_section_id)
     section = get_grade_section(grade_section_id)
+    block = request.args.get("block")
+
+    # For non-junior school grades, ask for block if not provided
+    if section and section.get("school_level") != "junior_school" and not block:
+        if request.method == "POST":
+            block = request.form.get("block")
+            if block:
+                return redirect(
+                    url_for(
+                        "toc.take_attendance_grade",
+                        grade_section_id=grade_section_id,
+                        block=block,
+                    )
+                )
+        return render_template(
+            "select_block.html",
+            grade_section=section,
+            page_title="TOC Attendance",
+            page_subtitle="Simple attendance form for senior school coverage.",
+            active_tool="TOC Attendance",
+        )
+
+    students = get_students_in_grade_section(grade_section_id)
     course_name = section["display_name"] if section else "Unknown Grade"
+    course_name = f"Block {block} - {course_name}" if block else course_name
 
     if request.method == "POST":
         absent_ids = request.form.getlist("absent")
         absent_students = [s for s in students if str(s["user_id"]) in absent_ids]
         submitter = current_user().get("display_name") or current_user().get("username")
-        log_attendance(absent_students, course_name, submitted_by=submitter)
         log_attendance(absent_students, course_name, [], submitted_by=submitter)
         return render_template(
             "take_attendance.html",
@@ -129,6 +150,7 @@ def take_attendance_grade(grade_section_id):
             absent_ids=absent_ids,
             course_name=course_name,
             teacher_id=None,
+            block=block,
             page_title="TOC Attendance",
             page_subtitle="Simple attendance form for senior school coverage.",
             active_tool="TOC Attendance",
@@ -139,6 +161,7 @@ def take_attendance_grade(grade_section_id):
         submitted=False,
         course_name=course_name,
         teacher_id=None,
+        block=block,
         page_title="TOC Attendance",
         page_subtitle="Simple attendance form for senior school coverage.",
         active_tool="TOC Attendance",

@@ -2,16 +2,22 @@
 {% block title %}Select Teacher · TOC Attendance{% endblock %}
 {% block content %}
   <div class="card">
-    <label>Select a grade</label>
-    <div class="grid">
-      {% for g in grade_sections %}
-        <a class="btn" href="{{ url_for('toc.take_attendance_grade', grade_section_id=g.id) }}">{{ g.display_name }}</a>
-      {% endfor %}
-    </div>
+    <label for="gradeSelect">Covering a grade?</label>
+    <form id="gradeForm">
+      <select id="gradeSelect" required>
+        <option value="" disabled selected>Select a grade…</option>
+        {% for g in grade_sections %}
+          <option value="{{ g.id }}">{{ g.display_name }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn" type="submit">Continue</button>
+    </form>
   </div>
 
+  <div style="text-align:center; margin:20px 0; color: var(--muted); font-weight:700;">OR</div>
+
   <div class="card">
-    <label for="q">Search for the teacher you’re covering</label>
+    <label for="q">Or search for the teacher you’re covering</label>
     <div class="ac-wrap">
       <input id="q" class="input" type="text" placeholder="Start typing a name…" autocomplete="off" aria-autocomplete="list" aria-controls="ac" aria-expanded="false">
       <div id="ac" class="ac-list" role="listbox"></div>
@@ -23,13 +29,20 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='app.js') }}"></script>
 <script>
+  document.getElementById('gradeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const gradeId = document.getElementById('gradeSelect').value;
+    if (gradeId) {
+      window.location.href = "{{ url_for('toc.take_attendance_grade', grade_section_id=0) }}".replace('/0', '/' + encodeURIComponent(gradeId));
+    }
+  });
   setupTeacherSearch({
     inputId: 'q',
     listId: 'ac',
     clearId: 'clearBtn',
     searchUrl: '{{ url_for("toc.search_teachers") }}',
     onPick: (teacher) => {
-      window.location.href = "{{ url_for('toc.select_course', teacher_id='__ID__') }}".replace('__ID__', encodeURIComponent(teacher.id));
+      window.location.href = "{{ url_for('toc.select_course', teacher_id=0) }}".replace('/0', '/' + encodeURIComponent(teacher.id));
     }
   });
 </script>
