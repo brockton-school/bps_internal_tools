@@ -1,6 +1,15 @@
+from datetime import datetime
+
 from .extensions import db
 from sqlalchemy import (
-    Column, String, Integer, Boolean, DateTime, ForeignKey, UniqueConstraint, Text
+    Column,
+    String,
+    Integer,
+    Boolean,
+    DateTime,
+    ForeignKey,
+    UniqueConstraint,
+    Text,
 )
 from sqlalchemy.orm import declarative_base, relationship
 
@@ -67,6 +76,8 @@ class People(db.Model):
     status = Column(String(64))
     pronouns = Column(String(255))
     grade = Column(String(64))
+    updated_at = Column(DateTime)
+    status_changed_at = Column(DateTime)
 
 class Enrollment(db.Model):
     __tablename__ = "enrollments"
@@ -89,3 +100,25 @@ class GradeSection(db.Model):
     display_name = Column(String(255), unique=True, nullable=False)
     school_level = Column(String(64))
     reference_course_id = Column(String(32), ForeignKey("courses.course_id", ondelete="SET NULL"))
+
+
+# ------ For MySchool Import --------
+class UserImport(db.Model):
+    __tablename__ = "user_imports"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    imported_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    changes = relationship("UserChangeLog", back_populates="import_log", cascade="all, delete-orphan")
+
+
+class UserChangeLog(db.Model):
+    __tablename__ = "user_change_logs"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    import_id = Column(Integer, ForeignKey("user_imports.id", ondelete="CASCADE"), nullable=True)
+    user_id = Column(String(64), nullable=False)
+    field = Column(String(64), nullable=False)
+    old_value = Column(Text)
+    new_value = Column(Text)
+    changed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    import_log = relationship("UserImport", back_populates="changes")

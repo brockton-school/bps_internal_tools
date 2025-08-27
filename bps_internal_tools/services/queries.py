@@ -16,6 +16,7 @@ def search_teacher_by_name(query):
         .where(Enrollment.role == "teacher")
         .where(Enrollment.course_id.like("c%"))
         .where(People.full_name.ilike(q))
+        .where(People.status == 'active')
     ).all()
     # DISTINCT-like (SQLA 2.0 distinct over tuple is possible; or dedupe in Python)
     seen, out = set(), []

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2 style="margin-top:0">SIS Sync</h2>
+  <p>Synchronize staff and student users from MySchool with Canvas.</p>
+
+  <h3 style="margin-top:16px">Generating the MySchool Users CSV</h3>
+  <ol>
+    <li>Navigate to the <strong>Export</strong> tab in <strong>MySchool</strong> under <strong>Administer</strong> in the sidebar.</li>
+    <li>Select <strong>User Info</strong>, and choose <strong>CSV</strong> as the format.</li>
+    <li>Under <strong>Targets</strong>, select <strong>all staff and students</strong> for <strong>Junior, Middle, and Senior School</strong>.<br>⚠️ <strong>Important:</strong> All must be selected to ensure users aren't removed unnecessarily.</li>
+    <li>Under <strong>Content</strong>, select the following fields:
+      <ul>
+        <li><strong>Surname</strong></li>
+        <li><strong>Name</strong></li>
+        <li><strong>User ID</strong></li>
+        <li><strong>Email</strong></li>
+        <li><strong>School Level</strong></li>
+        <li><strong>Class Level</strong></li>
+      </ul>
+      <em>(Scroll down to find the last few options.)</em>
+    </li>
+    <li>Press <strong>Export</strong> in the bottom-right corner.</li>
+    <li>A CSV file will download to your computer.</li>
+  </ol>
+
+  <h3 style="margin-top:16px">Import MySchool Users</h3>
+  <form action="{{ url_for('sis_sync.import_csv') }}" method="post" enctype="multipart/form-data">
+    <label for="csv_file">Upload MySchool Users CSV:</label>
+    <input id="csv_file" class="input" type="file" name="file" required>
+    <button class="btn" type="submit">Import</button>
+  </form>
+  <div class="row" style="margin-top:16px;">
+    <a class="btn" href="{{ url_for('sis_sync.export_users') }}">Download Canvas Users CSV</a>
+    <a class="btn" href="{{ url_for('sis_sync.custom_users') }}">Manage Custom Users</a>
+  </div>
+</div>
+{% endblock %}

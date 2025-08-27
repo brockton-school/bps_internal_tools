@@ -8,6 +8,12 @@ TOOLS = [
         "description": "Take attendance for a covered class.",
         "endpoint": ("toc.index", {}),  # (endpoint_name, kwargs)
     },
+    {
+        "slug": "sis_sync",
+        "name": "SIS Sync",
+        "description": "Synchronize MySchool CSV data with Canvas.",
+        "endpoint": ("sis_sync.index", {}),
+    },
     # Add more tools here as you grow…
 ]
 
