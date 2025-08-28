@@ -146,12 +146,14 @@ def create_grade_section_route():
     display_name = (request.form.get("display_name") or "").strip()
     school_level = (request.form.get("school_level") or "").strip()
     reference_course_id = (request.form.get("reference_course_id") or "").strip()
+    reference_is_section = bool(request.form.get("reference_is_section"))
     if not display_name:
         flash("Display name is required", "error"); return redirect(url_for("admin.grade_sections_page"))
     section = GradeSection(
         display_name=display_name,
         school_level=school_level or None,
         reference_course_id=reference_course_id or None,
+        reference_is_section=reference_is_section,
     )
     db.session.add(section)
     db.session.commit()
@@ -166,6 +168,7 @@ def update_grade_section_route(section_id):
     section.display_name = (request.form.get("display_name") or "").strip()
     section.school_level = (request.form.get("school_level") or "").strip() or None
     section.reference_course_id = (request.form.get("reference_course_id") or "").strip() or None
+    section.reference_is_section = bool(request.form.get("reference_is_section"))
     db.session.commit()
     flash(f"Grade section '{section.display_name}' updated", "ok")
     return redirect(url_for("admin.grade_sections_page"))

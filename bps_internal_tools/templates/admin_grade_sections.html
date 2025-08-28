@@ -13,6 +13,11 @@
     <label>Reference Course ID</label>
     <input class="input" name="reference_course_id" placeholder="c123456">
 
+    <label style="display:flex; align-items:center; margin-top:8px;">
+      <input type="checkbox" name="reference_is_section" style="margin-right:4px;">
+      Reference ID is Canvas Section
+    </label>
+
     <button class="btn" type="submit">Create Grade Section</button>
   </form>
 </div>
@@ -25,6 +30,7 @@
         <th>Display Name</th>
         <th>School Level</th>
         <th>Reference Course ID</th>
+        <th>Is Section?</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -35,6 +41,7 @@
         <td><input class="input" name="display_name" value="{{ s.display_name }}"></td>
         <td><input class="input" name="school_level" value="{{ s.school_level or '' }}"></td>
         <td><input class="input" name="reference_course_id" value="{{ s.reference_course_id or '' }}"></td>
+        <td style="text-align:center;"><input type="checkbox" name="reference_is_section" {% if s.reference_is_section %}checked{% endif %}></td>
         <td>
           <div class="row">
             <button class="btn" type="submit">Save</button>
