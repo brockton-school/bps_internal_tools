@@ -115,16 +115,18 @@ def get_grade_section(section_id: int) -> Optional[Dict]:
             GradeSection.display_name,
             GradeSection.school_level,
             GradeSection.reference_course_id,
+            GradeSection.reference_is_section,
         ).where(GradeSection.id == section_id)
     ).first()
     if not row:
         return None
-    gid, name, level, course_id = row
+    gid, name, level, course_id, is_section = row
     return {
         "id": gid,
         "display_name": name,
         "school_level": level,
         "reference_course_id": course_id,
+        "reference_is_section": is_section,
     }
 
 def get_students_in_grade_section(section_id: int) -> List[Dict]:
@@ -132,13 +134,17 @@ def get_students_in_grade_section(section_id: int) -> List[Dict]:
     info = get_grade_section(section_id)
     if not info or not info["reference_course_id"]:
         return []
-    course_id = info["reference_course_id"]
+    ref_id = info["reference_course_id"]
     s = db.session
+    stmt = select(People.user_id, People.full_name).join(
+        Enrollment, Enrollment.user_id == People.user_id
+    )
+    if info.get("reference_is_section"):
+        stmt = stmt.where(Enrollment.section_id == ref_id)
+    else:
+        stmt = stmt.where(Enrollment.course_id == ref_id)
     stmt = (
-        select(People.user_id, People.full_name)
-        .join(Enrollment, Enrollment.user_id == People.user_id)
-        .where(Enrollment.course_id == course_id)
-        .where(Enrollment.role == 'student')
+        stmt.where(Enrollment.role == 'student')
         .where(People.status == 'active')
         .order_by(People.full_name)
     )

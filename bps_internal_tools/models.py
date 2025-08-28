@@ -100,6 +100,7 @@ class GradeSection(db.Model):
     display_name = Column(String(255), unique=True, nullable=False)
     school_level = Column(String(64))
     reference_course_id = Column(String(32), ForeignKey("courses.course_id", ondelete="SET NULL"))
+    reference_is_section = Column(Boolean, default=False, nullable=False)
 
 
 # ------ For MySchool Import --------
