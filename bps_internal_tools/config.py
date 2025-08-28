@@ -19,6 +19,9 @@ class BaseConfig:
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
     OAUTH_REDIRECT_URI = os.getenv("OAUTH_REDIRECT_URI")  # https://.../auth/google/callback
     ALLOWED_DOMAIN = os.getenv("ALLOWED_DOMAIN", "brocktonschool.com")
+    CANVAS_API_URL = os.getenv("CANVAS_API_URL")
+    CANVAS_API_TOKEN = os.getenv("CANVAS_API_TOKEN")
+    CANVAS_ACCOUNT_ID = os.getenv("CANVAS_ACCOUNT_ID", "1")
 
 class DevConfig(BaseConfig):
     DEBUG = True

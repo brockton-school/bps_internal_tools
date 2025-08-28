@@ -8,6 +8,7 @@ from flask import (
     redirect,
     url_for,
     send_file,
+    current_app,
     flash,
 )
 from sqlalchemy import select
@@ -15,6 +16,7 @@ from sqlalchemy import select
 from bps_internal_tools.extensions import db
 from bps_internal_tools.models import People, UserImport, UserChangeLog
 from bps_internal_tools.services.auth import login_required, tool_required
+from bps_internal_tools.services.canvas import CanvasAPIError, sis_import
 from . import sis_sync_bp, TOOL_SLUG
 
 
@@ -187,6 +189,62 @@ def export_users():
         as_attachment=True,
         download_name="users.csv",
     )
+
+@sis_sync_bp.route("/push-canvas", methods=["POST"])
+@login_required
+@tool_required(TOOL_SLUG)
+def push_to_canvas():
+    base_url = current_app.config.get("CANVAS_API_URL")
+    token = current_app.config.get("CANVAS_API_TOKEN")
+    account_id = current_app.config.get("CANVAS_ACCOUNT_ID", "1")
+    if not base_url or not token:
+        flash("Canvas API not configured", "error")
+        return redirect(url_for("sis_sync.index"))
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        "user_id",
+        "login_id",
+        "first_name",
+        "last_name",
+        "short_name",
+        "sortable_name",
+        "full_name",
+        "email",
+        "status",
+        "authentication_provider_id",
+        "grade",
+    ])
+    for p in db.session.scalars(select(People)).all():
+        writer.writerow([
+            p.user_id,
+            p.login_id,
+            p.first_name,
+            p.last_name,
+            p.short_name,
+            p.sortable_name,
+            p.full_name,
+            p.email,
+            p.status,
+            p.authentication_provider_id,
+            p.grade,
+        ])
+    output.seek(0)
+    try:
+        sis_import(
+            output.getvalue().encode("utf-8"),
+            base_url=base_url,
+            token=token,
+            account_id=account_id,
+        )
+    except CanvasAPIError as exc:
+        flash(f"Canvas import failed: {exc}", "error")
+    except Exception as exc:
+        flash(f"Canvas import error: {exc}", "error")
+    else:
+        flash("Canvas import queued", "success")
+    return redirect(url_for("sis_sync.index"))
 
 
 @sis_sync_bp.route("/custom-users", methods=["GET", "POST"])
