@@ -14,7 +14,16 @@
     {% endif %}
   {% endwith %}
 
+  <a class="btn google-btn" href="{{ url_for('auth.login_google', next=next_url) }}">
+    <!-- simple inline svg icon or use background image via CSS -->
+    <span class="google-icon" aria-hidden="true"></span>
+    <span>Sign in with Google</span>
+  </a>
+
+  <div class="auth-divider"><span>or</span></div>
+
   <form method="post" action="{{ url_for('auth.login', next=next_url) }}" class="auth-form">
+    <label for="q">Advanced Use ONLY: Manual Login</label>
     <label for="username">Email or Username</label>
     <input id="username" name="username" type="text" autocomplete="username" required>
 
@@ -24,12 +33,5 @@
     <button class="btn primary mt-12" type="submit">Sign in</button>
   </form>
 
-  <div class="auth-divider"><span>or</span></div>
-
-  <a class="btn google-btn" href="{{ url_for('auth.login_google', next=next_url) }}">
-    <!-- simple inline svg icon or use background image via CSS -->
-    <span class="google-icon" aria-hidden="true"></span>
-    <span>Sign in with Google</span>
-  </a>
 </div>
 {% endblock %}
