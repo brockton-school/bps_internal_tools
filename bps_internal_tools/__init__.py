@@ -55,8 +55,10 @@ def create_app(config_name=None):
         vi = get_version_info()
         github_repo = "https://github.com/brockton-school/bps_internal_tools"
         commit_url = f"{github_repo}/commit/{vi['commit']}" if vi.get('commit') not in (None, "unknown") else None
+        version_url = f"{github_repo}/releases/tag/{vi['version']}" if vi.get('version') not in (None, "unknown") else None
         return {
             "version_info": vi.get('version'),
+            "version_url": version_url,
             "commit_hash": vi.get('commit'),
             "commit_url": commit_url,
             "copyright_text": "© 2025 Brockton School. All rights reserved."

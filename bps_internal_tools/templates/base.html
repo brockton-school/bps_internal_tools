@@ -69,7 +69,12 @@
     <footer>
       <div>{{ copyright_text }}</div>
       <div>
-        Version: {{ version_info }}
+        Version:
+        {% if version_url %}
+          <a href="{{ version_url }}" target="_blank">{{ version_info }}</a>
+        {% else %}
+          {{ version_info }}
+        {% endif %}
         {% if commit_url %}
           (<a href="{{ commit_url }}" target="_blank">{{ commit_hash }}</a>)
         {% else %}
