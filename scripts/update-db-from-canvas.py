@@ -27,7 +27,7 @@ import pandas as pd
 from sqlalchemy import create_engine, delete
 from sqlalchemy.orm import Session
 
-from bps_internal_tools.models import Base, Course, People, Enrollment
+from bps_internal_tools.models import Base, Course, Enrollment
 
 
 def parse_args() -> argparse.Namespace:
