@@ -99,7 +99,9 @@ class GradeSection(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     display_name = Column(String(255), unique=True, nullable=False)
     school_level = Column(String(64))
-    reference_course_id = Column(String(32), ForeignKey("courses.course_id", ondelete="SET NULL"))
+    # Can reference either a Canvas course ID or section ID; no FK constraint so
+    # sections without a backing course row can be stored
+    reference_course_id = Column(String(32))
     reference_is_section = Column(Boolean, default=False, nullable=False)
 
 
