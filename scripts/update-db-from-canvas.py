@@ -113,12 +113,10 @@ def main() -> None:
 
     csv_dir = args.dir
     courses_df = load_csv(os.path.join(csv_dir, "courses.csv"))
-    users_df = load_csv(os.path.join(csv_dir, "users.csv"))
     enrollments_df = load_csv(os.path.join(csv_dir, "enrollments.csv"))
 
     with Session(engine) as session:
         upsert_from_df(session, Course, courses_df, "course_id")
-        upsert_from_df(session, People, users_df, "user_id")
         replace_enrollments(session, enrollments_df)
 
     print("✅ Canvas SIS data imported")
