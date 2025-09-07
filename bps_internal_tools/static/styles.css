@@ -325,8 +325,23 @@ body[data-theme="light"] .table td {
   background: var(--panel-2);
 }
 .table .btn {
-  width: auto;
-  padding: 8px 12px;
+    width: auto;
+    padding: 8px 12px;
+}
+/* Compact table rows for dense data (non-touch) */
+.table.compact th,
+.table.compact td {
+    padding: 4px 6px;
+}
+.table.compact .input,
+.table.compact select {
+    padding: 6px 8px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+}
+.table.compact .btn {
+    padding: 6px 10px;
+    font-size: 0.9rem;
 }
 form.row-form { display: contents; }
 
