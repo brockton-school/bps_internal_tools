@@ -22,7 +22,7 @@
 
 <div class="card" style="margin-top:16px;">
   <h2 style="margin-top:0">Existing Users</h2>
-  <table class="table">
+  <table class="table compact">
     <thead>
       <tr>
         <th>Username</th>
@@ -47,7 +47,13 @@
           </select>
         </td>
         <td style="text-align:center;"><input type="checkbox" name="active" {% if u.active %}checked{% endif %}></td>
-        <td><input class="input" type="password" name="new_password" placeholder="Leave blank to keep existing"></td>
+        <td>
+          {% if u.auth_provider == 'google' %}
+          <input class="input" type="password" disabled placeholder="Google SSO">
+          {% else %}
+          <input class="input" type="password" name="new_password" placeholder="Leave blank to keep existing">
+          {% endif %}
+        </td>
         <td>
           <div class="row">
             <button class="btn" type="submit">Save</button>

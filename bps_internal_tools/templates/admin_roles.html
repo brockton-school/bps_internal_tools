@@ -32,56 +32,70 @@
 
 <div class="card" style="margin-top:16px;">
   <h2 style="margin-top:0">Existing Roles</h2>
+
+  {% for r in roles %}
+    <form id="form-{{ r.role }}" method="post" action="{{ url_for('admin.update_role_route', role=r.role) }}"></form>
+    <form id="delete-{{ r.role }}" method="post" action="{{ url_for('admin.delete_role_route', role=r.role) }}"></form>
+  {% endfor %}
+
   <table class="table">
-      <thead>
-        <tr>
-          <th>Role</th>
-          <th>Tools</th>
-          <th>Active</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
+    <thead>
+      <tr>
+        <th>Tool / Feature</th>
         {% for r in roles %}
-        <form method="post" action="{{ url_for('admin.update_role_route', role=r.role) }}" class="row-form">
-        <tr>
-          <td><strong>{{ r.role }}</strong> {% if not r.active %}<span style="color:#ffa6a6;">(inactive)</span>{% endif %}</td>
-          <td>
-          <div class="grid">
-            {% set allowed = r.tools %}
-            {% for t in tools %}
-              <label class="tile">
-                <input type="checkbox" name="tools[]" value="{{ t.slug }}"
-                       {% if '*' in allowed or t.slug in allowed %}checked{% endif %}>
-                <span>{{ t.name }} <span style="color:var(--muted);">({{ t.slug }})</span></span>
-              </label>
-            {% endfor %}
-            <label class="tile">
-              <input type="checkbox" name="tools[]" value="*"
-                     {% if allowed == ['*'] %}checked{% endif %}>
-              <span>All Tools</span>
-            </label>
-          </div>
-        </td>
-        <td style="text-align:center;">
-          <input type="checkbox" name="active" {% if r.active %}checked{% endif %}>
-        </td>
-        <td>
-          <div class="row">
-            <button class="btn" type="submit">Save</button>
-            <button
-              class="btn danger outline confirm-delete"
-              type="submit"
-              formmethod="post"
-              formaction="{{ url_for('admin.delete_role_route', role=r.role) }}"
-              formnovalidate
-              aria-label="Delete role {{ r.role }}"
-            >Delete</button>
-          </div>
-        </td>
+          <th>
+            <div class="col" style="gap:8px;">
+              <div>
+                <strong>{{ r.role }}</strong>
+                {% if not r.active %}<span style="color:#ffa6a6;">(inactive)</span>{% endif %}
+              </div>
+              <div class="row">
+                <button class="btn" type="submit" form="form-{{ r.role }}">Save</button>
+                <button
+                  class="btn danger outline confirm-delete"
+                  type="submit"
+                  form="delete-{{ r.role }}"
+                  formnovalidate
+                  aria-label="Delete role {{ r.role }}"
+                >Delete</button>
+              </div>
+            </div>
+          </th>
+        {% endfor %}
       </tr>
-      </form>
+    </thead>
+    <tbody>
+      {% for t in tools %}
+        <tr>
+          <td>{{ t.name }} <span style="color:var(--muted);">({{ t.slug }})</span></td>
+          {% for r in roles %}
+            {% set allowed = r.tools %}
+            <td style="text-align:center;">
+              <input type="checkbox" name="tools[]" value="{{ t.slug }}"
+                     {% if '*' in allowed or t.slug in allowed %}checked{% endif %}
+                     form="form-{{ r.role }}">
+            </td>
+          {% endfor %}
+        </tr>
       {% endfor %}
+      <tr>
+        <td>All Tools</td>
+        {% for r in roles %}
+          <td style="text-align:center;">
+            <input type="checkbox" name="tools[]" value="*"
+                   {% if r.tools == ['*'] %}checked{% endif %}
+                   form="form-{{ r.role }}">
+          </td>
+        {% endfor %}
+      </tr>
+      <tr>
+        <td>Active</td>
+        {% for r in roles %}
+          <td style="text-align:center;">
+            <input type="checkbox" name="active" {% if r.active %}checked{% endif %} form="form-{{ r.role }}">
+          </td>
+        {% endfor %}
+      </tr>
     </tbody>
   </table>
 </div>

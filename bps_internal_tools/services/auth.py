@@ -11,10 +11,16 @@ HASH_METHOD = "pbkdf2:sha256"
 # ---------- Loaders ----------
 def load_users():
     s = db.session
-    return {u.username: {
-        "username": u.username, "display_name": u.display_name,
-        "role": u.role_name, "active": u.active
-    } for u in s.execute(select(User)).scalars().all()}
+    return {
+        u.username: {
+            "username": u.username,
+            "display_name": u.display_name,
+            "role": u.role_name,
+            "active": u.active,
+            "auth_provider": u.auth_provider,
+        }
+        for u in s.execute(select(User)).scalars().all()
+    }
 
 def load_roles():
     s = db.session
