@@ -28,7 +28,7 @@ def home():
 def index():
     grade_sections = get_grade_sections()
     return render_template(
-        "index.html",
+        "toc-attendance/index.html",
         grade_sections=grade_sections,
         page_title="TOC Attendance",
         page_subtitle="Simple attendance form class coverage.",
@@ -58,7 +58,7 @@ def select_course(teacher_id):
         )
     courses = get_courses_for_user(teacher_id, role="teacher", terms=DEFAULT_TERMS)
     return render_template(
-        "select_course.html",
+        "toc-attendance/select_course.html",
         courses=courses,
         teacher_id=teacher_id,
         page_title="TOC Attendance",
@@ -84,7 +84,7 @@ def take_attendance(course_id):
         submitter = current_user().get("display_name") or current_user().get("username")
         log_attendance(absent_students, course_name, teachers, submitted_by=submitter)
         return render_template(
-            "take_attendance.html",
+            "toc-attendance/take_attendance.html",
             students=students,
             submitted=True,
             absent_ids=absent_ids,
@@ -96,7 +96,7 @@ def take_attendance(course_id):
             active_tool="TOC Attendance",
         )
     return render_template(
-        "take_attendance.html",
+        "toc-attendance/take_attendance.html",
         students=students,
         submitted=False,
         course_name=course_name,
@@ -127,7 +127,7 @@ def take_attendance_grade(grade_section_id):
                     )
                 )
         return render_template(
-            "select_block.html",
+            "toc-attendance/select_block.html",
             grade_section=section,
             page_title="TOC Attendance",
             page_subtitle="Simple attendance form for senior school coverage.",
@@ -144,7 +144,7 @@ def take_attendance_grade(grade_section_id):
         submitter = current_user().get("display_name") or current_user().get("username")
         log_attendance(absent_students, course_name, [], submitted_by=submitter)
         return render_template(
-            "take_attendance.html",
+            "toc-attendance/take_attendance.html",
             students=students,
             submitted=True,
             absent_ids=absent_ids,
@@ -156,7 +156,7 @@ def take_attendance_grade(grade_section_id):
             active_tool="TOC Attendance",
         )
     return render_template(
-        "take_attendance.html",
+        "toc-attendance/take_attendance.html",
         students=students,
         submitted=False,
         course_name=course_name,

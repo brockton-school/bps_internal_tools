@@ -38,9 +38,9 @@ def create_app(config_name=None):
     # error handlers (keep your 403/404)
     from flask import render_template
     @app.errorhandler(403)
-    def forbidden(e): return render_template("403.html"), 403
+    def forbidden(e): return render_template("error/403.html"), 403
     @app.errorhandler(404)
-    def not_found(e): return render_template("404.html"), 404
+    def not_found(e): return render_template("error/404.html"), 404
 
     from bps_internal_tools.auth.routes import current_user
     @app.context_processor
