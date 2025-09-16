@@ -17,7 +17,13 @@
     {% else %}
       <form method="post">
         <input type="hidden" name="block" value="{{ block }}">
-        <label>Select any students that are <b>ABSENT</b>.</label>
+        <div class="attendance-instructions" role="note">
+          <div class="icon" aria-hidden="true">!</div>
+          <div>
+            <h2>Mark <span>ABSENT</span> students</h2>
+            <p>Select only the students who are not here.</p>
+          </div>
+        </div>
         <div class="grid">
           {% for s in students %}
             <label class="tile">
