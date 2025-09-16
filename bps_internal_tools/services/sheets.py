@@ -1,8 +1,11 @@
+from datetime import datetime
+import os
+
 import gspread
 from gspread_formatting import format_cell_range, CellFormat, TextFormat
 from google.oauth2.service_account import Credentials
-from datetime import datetime
-import os
+
+from bps_internal_tools.services.settings import get_system_tzinfo
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_CREDENTIALS_PATH', "/home/alan/bps_internal_tools/env/splendid-sunset-436122-n9-2a123c008b07.json")
@@ -12,8 +15,11 @@ credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes
 client = gspread.authorize(credentials)
 sheet = client.open_by_key(GOOGLE_SHEET_ID)
 
+def _now_local():
+    return datetime.now(get_system_tzinfo())
+
 def get_or_create_today_tab():
-    today_name = datetime.now().strftime("%Y-%m-%d")
+    today_name = _now_local().strftime("%Y-%m-%d")
     try:
         ws = sheet.worksheet(today_name)
     except gspread.exceptions.WorksheetNotFound:
@@ -74,7 +80,7 @@ def bold_row(worksheet, row_number):
 
 def log_attendance(absent_students, course_name, teachers, submitted_by):
     ws = get_or_create_today_tab()
-    now = datetime.now()
+    now = _now_local()
     date_str = now.strftime("%Y-%m-%d")
     time_str = now.strftime("%H:%M")
 

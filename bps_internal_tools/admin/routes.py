@@ -1,14 +1,19 @@
 from flask import render_template, request, redirect, url_for, flash
 from bps_internal_tools.services.auth import (
-    load_users, 
-    load_roles, 
+    load_users,
+    load_roles,
     add_user, 
     update_user, 
     delete_user, 
     add_role, 
     update_role, 
-    delete_role, 
+    delete_role,
     tool_required)
+from bps_internal_tools.services.settings import (
+    get_system_timezone,
+    list_supported_timezones,
+    set_system_timezone,
+)
 from bps_internal_tools.tools_registry import all_tools, tool_slugs
 from bps_internal_tools.models import GradeSection
 from bps_internal_tools.extensions import db
@@ -27,9 +32,11 @@ def settings_home():
             "role_count": len(roles),
             "active_roles": sum(1 for r in roles.values() if r["active"]),
         },
-        page_title="Admin · Settings",
-        page_subtitle="Manage platform settings",
-        active_tool="Settings"
+        current_timezone = get_system_timezone(),
+        timezone_options = list_supported_timezones(),
+        page_title = "Admin · Settings",
+        page_subtitle = "Manage platform settings",
+        active_tool = "Settings"
     )
 
 
@@ -44,6 +51,21 @@ def roles_page():
                            page_title="Admin · Roles",
                            page_subtitle="Define which tools each role can access",
                            active_tool="Settings")
+
+@admin_bp.route("/settings/timezone", methods=["POST"])
+@tool_required(TOOL_SLUG)
+def update_timezone():
+    timezone = (request.form.get("timezone") or "").strip()
+    if not timezone:
+        flash("Timezone is required", "error")
+        return redirect(url_for("admin.settings_home"))
+    try:
+        set_system_timezone(timezone)
+    except ValueError as exc:
+        flash(str(exc), "error")
+    else:
+        flash(f"System timezone set to {timezone}", "ok")
+    return redirect(url_for("admin.settings_home"))
 
 @admin_bp.route("/settings/roles/create", methods=["POST"])
 @tool_required(TOOL_SLUG)
