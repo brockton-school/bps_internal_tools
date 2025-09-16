@@ -34,5 +34,9 @@
     <a class="btn" href="{{ url_for('sis_sync.export_users') }}">Download Canvas Users CSV</a>
     <a class="btn" href="{{ url_for('sis_sync.custom_users') }}">Manage Custom Users</a>
   </div>
+  <form action="{{ url_for('sis_sync.push_to_canvas') }}" method="post" style="margin-top:16px;" onsubmit="return confirm('This will push user updates directly to Canvas. This action is dangerous and cannot be undone. Continue?');">
+    <button class="btn" style="background-color:#c00;color:#fff;">Push Users to Canvas</button>
+  </form>
+  <p style="color:#c00;margin-top:8px;">⚠️ This will perform a SIS import via the Canvas API.</p>
 </div>
 {% endblock %}
