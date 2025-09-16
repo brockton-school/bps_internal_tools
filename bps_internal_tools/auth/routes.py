@@ -52,7 +52,7 @@ def login():
 
         if not u or not u.password_hash or not check_password_hash(u.password_hash, password):
             flash("Invalid username or password.", "error")
-            return render_template("login.html", next_url=next_url)
+            return render_template("auth/login.html", next_url=next_url)
 
         # Build session payload (same structure used across the app)
         session["user"] = {
@@ -65,7 +65,7 @@ def login():
         return redirect(next_url)
 
     # GET: show form + Google button
-    return render_template("login.html", next_url=next_url)
+    return render_template("auth/login.html", next_url=next_url)
 
 @auth_bp.route("/login/google")
 def login_google():

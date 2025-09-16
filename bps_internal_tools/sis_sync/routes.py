@@ -25,7 +25,7 @@ from . import sis_sync_bp, TOOL_SLUG
 @tool_required(TOOL_SLUG)
 def index():
     return render_template(
-        "sis_sync_index.html",
+        "sis_sync/index.html",
         page_title="SIS Sync",
         page_subtitle="Sync users from MySchool",
         active_tool="SIS Sync",
@@ -293,7 +293,7 @@ def custom_users():
 
     customs = [p for p in db.session.scalars(select(People)).all() if not re.match(r"^u\d{6}$", p.user_id or "")]
     return render_template(
-        "custom_users.html",
+        "sis_sync/custom_users.html",
         users=customs,
         page_title="Custom Users",
         page_subtitle="Manage non-SIS users",

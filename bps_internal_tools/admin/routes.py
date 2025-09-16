@@ -20,7 +20,7 @@ def settings_home():
     users = load_users()
     roles = load_roles()
     return render_template(
-        "admin_settings_home.html",
+        "admin/settings_home.html",
         stats={
             "user_count": len(users),
             "active_users": sum(1 for u in users.values() if u["active"]),
@@ -39,7 +39,7 @@ def settings_home():
 def roles_page():
     roles = sorted(load_roles().values(), key=lambda r: r["role"])
     tools = all_tools()
-    return render_template("admin_roles.html",
+    return render_template("admin/roles.html",
                            roles=roles, tools=tools,
                            page_title="Admin · Roles",
                            page_subtitle="Define which tools each role can access",
@@ -88,7 +88,7 @@ def delete_role_route(role):
 def users_page():
     users = sorted(load_users().values(), key=lambda u: u["username"])
     roles = sorted(load_roles().values(), key=lambda r: r["role"])
-    return render_template("admin_users.html",
+    return render_template("admin/users.html",
                            users=users, roles=roles,
                            page_title="Admin · Users",
                            page_subtitle="Create users and assign roles",
@@ -132,7 +132,7 @@ def delete_user_route(username):
 def grade_sections_page():
     sections = GradeSection.query.order_by(GradeSection.display_name).all()
     return render_template(
-        "admin_grade_sections.html",
+        "admin/grade_sections.html",
         sections=sections,
         page_title="Admin · Grade Sections",
         page_subtitle="Manage grade sections",
