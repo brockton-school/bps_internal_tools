@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Name</title>
+    
+    <!-- Link to external stylesheet -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='autocomplete.js') }}"></script>  <!-- Add JS file for autocomplete -->
+
+    <!-- Make text field focused by default -->
+    <script>
+        window.onload = function() {
+            setupNamePage();
+        };
+    </script>
+</head>
+<body>
+    <!-- "X" Reset Button -->
+    <a href="/" class="reset-btn">X</a>
+    
+    <h1>Please Enter Your Name</h1>
+    <form action="/signinout" method="POST">
+        <input type="hidden" id="user-type-input" name="user_type" value="{{ user_type }}">
+        {% if grade %}
+        <input type="hidden" name="grade" value="{{ grade }}">
+        {% endif %}
+        
+        <label id="name-input-label" for="guest-name">Begin typing your name and select from the list:</label>
+
+        <!-- Container for input and autocomplete suggestions -->
+        <div class="autocomplete-container">
+            <input type="text" id="name-input" name="guest-name" required oninput="fetchSuggestions('{{ user_type }}', '{{ grade|default('') }}')" autocomplete="off">
+            <div id="autocomplete-list" class="autocomplete-items"></div>
+        </div>
+
+        <!-- Submit button placed below the suggestions -->
+        <button hidden id="name-submit-btn" type="submit">Next</button>
+    </form>
+</body>
+</html>

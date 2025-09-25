@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Your Name</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- "X" Reset Button -->
+    <a href="/" class="reset-btn">X</a>
+
+    <h1>Select Your Name</h1>
+    <form class="student-name-form" action="/signinout" method="POST">
+        <input type="hidden" name="user_type" value="{{ user_type }}">
+        <input type="hidden" name="grade" value="{{ grade }}">
+        <input type="hidden" name="guest-name" id="student-name-input">  <!-- Hidden input to store selected name -->
+
+        <!-- Grid of buttons for student names -->
+        <div class="grid-container" id="student-grid"></div>
+
+        <!-- Submit button, hidden as we automatically submit when name is selected -->
+        <button type="submit" id="submit-button" style="display:none;">Next</button>
+    </form>
+
+    <script>
+        // Fetch student names and populate the grid with buttons
+        window.onload = function() {
+            const grade = "{{ grade }}";
+            fetch(`/student_names?grade=${grade}`)
+                .then(response => response.json())
+                .then(data => {
+                    const gridContainer = document.getElementById('student-grid');
+                    data.forEach(name => {
+                        const button = document.createElement('button');
+                        button.innerText = name;
+                        button.classList.add('name-btn');
+                        button.onclick = function() {
+                            document.getElementById('student-name-input').value = name;
+                            document.getElementById('submit-button').click();  // Automatically submit form
+                        };
+                        gridContainer.appendChild(button);
+                    });
+                });
+        }
+    </script>
+</body>
+</html>

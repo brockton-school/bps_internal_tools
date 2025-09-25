@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Grade</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- "X" Reset Button -->
+    <a href="/" class="reset-btn">X</a>
+
+    <h1>Select Your Grade</h1>
+    <form action="{{ url_for('main.grade') }}" method="POST">
+        <div class="grid-container">
+            {% for grade in grades %}
+                <button type="submit" name="grade" value="{{ grade }}" class="grade-btn">{{ grade }}</button>
+            {% endfor %}
+        </div>
+    </form>
+</body>
+</html>
