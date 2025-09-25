@@ -34,6 +34,33 @@
       <a class="btn" style="width:auto;" href="{{ url_for('admin.grade_sections_page') }}">Manage Grade Sections</a>
     </div>
 
+    <!-- System Timezone card -->
+    <div class="tile" style="flex-direction:column; align-items:flex-start;">
+      <div style="font-weight:800; font-size:1.1rem;">System Timezone</div>
+      <div style="color:var(--muted); margin:6px 0 16px;">
+        Used when recording submission dates and times in Google Sheets.
+      </div>
+      <form method="post" action="{{ url_for('admin.update_timezone') }}" style="width:100%;">
+        <label for="timezone-select">Current timezone</label>
+        <input
+          id="timezone-select"
+          name="timezone"
+          class="input"
+          type="text"
+          list="timezone-options"
+          value="{{ current_timezone }}"
+          required
+        >
+        <datalist id="timezone-options">
+          {% for tz in timezone_options %}
+            <option value="{{ tz }}"></option>
+          {% endfor %}
+        </datalist>
+        <button class="btn" style="width:auto; margin-top:12px;">Save Timezone</button>
+      </form>
+    </div>
+
+
     <!-- Future settings live here -->
     <div class="tile" style="flex-direction:column; align-items:flex-start; opacity:.7;">
       <div style="font-weight:800; font-size:1.1rem;">Integrations</div>

@@ -15,6 +15,16 @@ from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
+# --- Simple App Settings Store ---
+class AppSetting(db.Model):
+    __tablename__ = "app_settings"
+
+    key = Column(String(128), primary_key=True)
+    value = Column(Text, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+
+
 # --- Auth / RBAC ---
 class Role(db.Model):
     __tablename__ = "roles"
