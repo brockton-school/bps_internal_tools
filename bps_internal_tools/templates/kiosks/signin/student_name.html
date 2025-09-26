@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Your Name</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='kiosks/signin/styles.css') }}">
 </head>
 <body>
     <!-- "X" Reset Button -->
-    <a href="/" class="reset-btn">X</a>
+    <a href="{{ url_for('kiosks_signin.index') }}" class="reset-btn">X</a>
 
     <h1>Select Your Name</h1>
-    <form class="student-name-form" action="/signinout" method="POST">
+    <form class="student-name-form" action="{{ url_for('kiosks_signin.signinout') }}" method="POST">
         <input type="hidden" name="user_type" value="{{ user_type }}">
         <input type="hidden" name="grade" value="{{ grade }}">
         <input type="hidden" name="guest-name" id="student-name-input">  <!-- Hidden input to store selected name -->
@@ -27,7 +27,8 @@
         // Fetch student names and populate the grid with buttons
         window.onload = function() {
             const grade = "{{ grade }}";
-            fetch(`/student_names?grade=${grade}`)
+            const studentNamesUrl = "{{ url_for('kiosks_signin.student_names') }}";
+            fetch(`${studentNamesUrl}?grade=${grade}`)
                 .then(response => response.json())
                 .then(data => {
                     const gridContainer = document.getElementById('student-grid');

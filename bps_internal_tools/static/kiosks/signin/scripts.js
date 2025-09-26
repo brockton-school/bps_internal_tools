@@ -1,12 +1,14 @@
 // Redirect after 2 seconds (confirmation page)
 function redirectConfToHome() {
+    const config = window.KIOSK_SIGNIN_CONFIG || {};
+    const homeUrl = config.homeUrl || "/kiosks/signin";
     setTimeout(function() {
-        window.location.href = "/";
+        window.location.href = homeUrl;
     }, 5000);
 
     // Redirect back to the root when the user clicks anywhere on the screen
     document.body.addEventListener('click', function() {
-        window.location.href = '/';
+        window.location.href = homeUrl;
     });
 }
 

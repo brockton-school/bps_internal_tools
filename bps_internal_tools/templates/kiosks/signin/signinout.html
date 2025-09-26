@@ -7,14 +7,19 @@
 
     <!-- Link to external stylesheet -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='kiosks/signin/styles.css') }}">
 
     <!-- Link to external JS scripts -->
-    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+    <script>
+        window.KIOSK_SIGNIN_CONFIG = {
+            homeUrl: "{{ url_for('kiosks_signin.index') }}"
+        };
+    </script>
+    <script src="{{ url_for('static', filename='kiosks/signin/scripts.js') }}"></script>
 </head>
 <body>
     <h1 id="sign-in-out-header">Are you signing in or out?</h1>
-    <form id="signForm" action="/submit" method="POST">
+    <form id="signForm" action="{{ url_for('kiosks_signin.submit') }}" method="POST">
         <input type="hidden" name="name" value="{{ name }}">
         <input type="hidden" id="user-type-input" name="user_type" value="{{ user_type }}">
         <input type="hidden" id="reason-needed-input" name="reason-needed" value="{{ reason_needed }}">
@@ -26,7 +31,7 @@
         <input type="hidden" id="return-time-input" name="return_time" value="None">
 
         <!-- "X" Reset Button -->
-        <a href="/" class="reset-btn">X</a>
+        <a href="{{ url_for('kiosks_signin.index') }}" class="reset-btn">X</a>
 
         <!-- Sign In / Sign Out buttons -->
         <div id="action-buttons">

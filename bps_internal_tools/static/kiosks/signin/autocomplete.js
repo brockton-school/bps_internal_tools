@@ -20,6 +20,8 @@ function setupNamePage() {
 }
 
 function fetchSuggestions(userType, grade) {
+    const config = window.KIOSK_SIGNIN_CONFIG || {};
+    const autocompleteUrl = config.autocompleteUrl || "/kiosks/signin/autocomplete";
     const input = document.getElementById('name-input').value;
     const list = document.getElementById('autocomplete-list');
     
@@ -36,7 +38,13 @@ function fetchSuggestions(userType, grade) {
     }
 
     // Fetch suggestions from the server
-    fetch(`/autocomplete?query=${input}&user_type=${userType}&grade=${grade}`)
+    const params = new URLSearchParams({
+        query: input,
+        user_type: userType,
+        grade: grade
+    });
+
+    fetch(`${autocompleteUrl}?${params.toString()}`)
         .then(response => response.json())
         .then(data => {
             data.forEach(item => {

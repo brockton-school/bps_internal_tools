@@ -7,8 +7,14 @@
     
     <!-- Link to external stylesheet -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="{{ url_for('static', filename='autocomplete.js') }}"></script>  <!-- Add JS file for autocomplete -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='kiosks/signin/styles.css') }}">
+    <script>
+        window.KIOSK_SIGNIN_CONFIG = {
+            autocompleteUrl: "{{ url_for('kiosks_signin.autocomplete') }}",
+            homeUrl: "{{ url_for('kiosks_signin.index') }}"
+        };
+    </script>
+    <script src="{{ url_for('static', filename='kiosks/signin/autocomplete.js') }}"></script>
 
     <!-- Make text field focused by default -->
     <script>
@@ -19,10 +25,10 @@
 </head>
 <body>
     <!-- "X" Reset Button -->
-    <a href="/" class="reset-btn">X</a>
-    
+    <a href="{{ url_for('kiosks_signin.index') }}" class="reset-btn">X</a>
+
     <h1>Please Enter Your Name</h1>
-    <form action="/signinout" method="POST">
+    <form action="{{ url_for('kiosks_signin.signinout') }}" method="POST">
         <input type="hidden" id="user-type-input" name="user_type" value="{{ user_type }}">
         {% if grade %}
         <input type="hidden" name="grade" value="{{ grade }}">
