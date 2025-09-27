@@ -1,0 +1,35 @@
+body {
+    font-family: 'Nunito Sans', sans-serif;
+    margin: 20px;
+    padding: 20px;
+}
+
+h1 {
+    color: #4CAF50;
+}
+
+form {
+    margin-top: 20px;
+}
+
+input[type="file"] {
+    margin: 10px 0;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.flash {
+    color: red;
+    margin-top: 10px;
+}

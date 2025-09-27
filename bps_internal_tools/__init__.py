@@ -6,6 +6,8 @@ from .extensions import db
 from .auth import auth_bp
 from .admin import admin_bp
 from .toc_attendance import toc_bp
+from .kiosks import kiosk_bp
+from .kiosks.signin.routes import signin_bp
 from .sis_sync import sis_sync_bp
 from .security import set_security_headers
 from .extensions import oauth
@@ -34,6 +36,8 @@ def create_app(config_name=None):
     app.register_blueprint(toc_bp, url_prefix="/toc-attendance")
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(sis_sync_bp, url_prefix="/sis-sync")
+    app.register_blueprint(kiosk_bp, url_prefix="/kiosks")
+    app.register_blueprint(signin_bp, url_prefix="/kiosks/signin")
 
     # error handlers (keep your 403/404)
     from flask import render_template
