@@ -1,8 +1,17 @@
 from datetime import datetime
 
-from flask import Blueprint, jsonify, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    abort,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 
 from bps_internal_tools.config import SignInKioskConfig
+from bps_internal_tools.services.auth import current_user, role_allows_tool
 from bps_internal_tools.services.kiosks.signin.excel import save_to_local_file
 from bps_internal_tools.services.kiosks.signin.sheets import get_or_create_sheet
 from bps_internal_tools.services.kiosks.signin.utils import (
@@ -19,6 +28,16 @@ from bps_internal_tools.services.settings import get_system_tzinfo
 from bps_internal_tools.services.utils import format_time, get_version_info
 
 signin_bp = Blueprint("kiosks_signin", __name__)
+
+@signin_bp.before_request
+def ensure_kiosk_access():
+    user = current_user()
+    if not user:
+        next_url = request.full_path if request.query_string else request.path
+        return redirect(url_for("auth.login", next=next_url))
+    if not role_allows_tool(user.get("role"), "kiosks_signin"):
+        abort(403)
+
 
 
 @signin_bp.route("/")
@@ -79,10 +98,8 @@ def signinout():
 
 @signin_bp.route("/submit", methods=["POST"])
 def submit():
-    auth = request.authorization
-    account = "unknown"
-    if auth:
-        account = auth.username
+    session_user = current_user() or {}
+    account = session_user.get("username", "unknown")
 
     action = request.form["action"]
     name = request.form["name"]
