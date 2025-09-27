@@ -1,10 +1,13 @@
-import subprocess
-import os
-import csv
-
 from datetime import datetime, time
+from typing import List
+
 import pytz
-from config import PERSONNEL_CSV_PATH
+from sqlalchemy import func
+
+from bps_internal_tools.extensions import db
+from bps_internal_tools.models import People
+
+ACTIVE_STATUS = "active"
 
 def format_time(datetime_obj):
     """Formats a datetime object into a 12-hour time string."""
@@ -25,71 +28,105 @@ def get_version_info():
         return "Version information not available"
 
 # Function to read grades from the CSV file
-def read_grades_from_csv(file_path):
-    grades = []
-    with open(file_path, 'r') as csvfile:
-        reader = csv.reader(csvfile)
-        for row in reader:
-            grades.append(row[0])
-    return grades
+def get_grades() -> List[str]:
+    """Return a sorted list of distinct grades for active Canvas users."""
+
+    grade_rows = (
+        db.session.query(func.trim(People.grade))
+        .filter(func.lower(People.status) == ACTIVE_STATUS)
+        .filter(People.grade.isnot(None))
+        .filter(func.trim(People.grade) != "")
+        .distinct()
+        .order_by(func.lower(People.grade))
+        .all()
+    )
+
+    return [row[0] for row in grade_rows]
 
 # Function to get suggestions from the CSV file
-def get_personnel_suggestions(query, user_type, grade):
-    suggestions = []
-    with open(PERSONNEL_CSV_PATH, 'r') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            full_name = f"{row['NAME']} {row['SURNAME']}"
-            
-            # If the query matches the name
-            if query.lower() in full_name.lower():
-                # If user is Staff, suggest only those without a Class Level (staff)
-                if user_type == "Staff" and not row['CLASS LEVEL']:
-                    suggestions.append(full_name)
-                # If user is a Student, suggest those with matching Class Level
-                elif user_type == "Student" and row['CLASS LEVEL'] == grade:
-                    suggestions.append(full_name)
+def get_personnel_suggestions(query: str, user_type: str, grade: str) -> List[str]:
+    """Return a list of matching names for the provided query."""
 
-    return suggestions
+    if not query:
+        return []
 
-def get_school_level(full_name):
-    """
-    Given a full name in the format "NAME SURNAME", return the associated SCHOOL LEVEL.
-    If the SCHOOL LEVEL is blank or the name isn't found, return an empty string.
-    """
-    try:
-        with open(PERSONNEL_CSV_PATH, mode="r", encoding="utf-8") as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                # Construct the full name from "NAME" and "SURNAME" columns
-                csv_full_name = f"{row['NAME']} {row['SURNAME']}".strip()
+    query = query.strip()
+    if not query:
+        return []
 
-                if csv_full_name.lower() == full_name.lower():  # Case-insensitive comparison
-                    return row['SCHOOL LEVEL'].strip() if row['SCHOOL LEVEL'].strip() else ""
+    people_query = db.session.query(People.full_name).filter(
+        func.lower(People.status) == ACTIVE_STATUS
+    )
 
-    except FileNotFoundError:
-        print(f"Error: File not found at {PERSONNEL_CSV_PATH}")
-    except Exception as e:
-        print(f"Error: {e}")
+    if user_type == "Staff":
+        people_query = people_query.filter(
+            (People.grade.is_(None)) | (func.trim(People.grade) == "")
+        )
+    elif user_type == "Student":
+        if grade:
+            people_query = people_query.filter(func.lower(func.trim(People.grade)) == grade.lower())
+        else:
+            people_query = people_query.filter(
+                People.grade.isnot(None), func.trim(People.grade) != ""
+            )
+    else:
+        # Visitors are entered manually
+        return []
 
-    return ""  # Return empty string if not found or SCHOOL LEVEL is blank
+    like_pattern = f"%{query.lower()}%"
+    results = (
+        people_query.filter(func.lower(People.full_name).like(like_pattern))
+        .order_by(People.full_name)
+        .limit(10)
+        .all()
+    )
 
-# Function to load users from the CSV file
-def load_users_from_csv(filepath="users.csv"):
-    print(filepath)
-    users = {}
-    try:
-        with open(filepath, mode='r') as file:
-            reader = csv.reader(file)
-            for row in reader:
-                if len(row) == 2:
-                    username, hashed_password = row
-                    users[username] = hashed_password
-    except FileNotFoundError:
-        print(f"User credentials file not found: {filepath}")
-    return users
+    return [row[0] for row in results]
 
-USERS = load_users_from_csv()
+def get_school_level(full_name: str) -> str:
+    """Return the school level suffix for a staff member if available."""
+
+    if not full_name:
+        return ""
+
+    person = (
+        db.session.query(People.grade)
+        .filter(func.lower(People.status) == ACTIVE_STATUS)
+        .filter(func.lower(People.full_name) == full_name.lower())
+        .first()
+    )
+
+    if not person:
+        return ""
+
+    grade = (person[0] or "").strip()
+    if not grade:
+        return ""
+
+    grade_upper = grade.upper()
+    if grade_upper in {"JS", "SS"}:
+        return f" ({grade_upper})"
+    if grade_upper == "ADMIN":
+        return " (Admin)"
+
+    return ""
+
+
+def get_student_names_by_grade(grade: str) -> List[str]:
+    """Return a sorted list of active students for the provided grade."""
+
+    if not grade:
+        return []
+
+    results = (
+        db.session.query(People.full_name)
+        .filter(func.lower(People.status) == ACTIVE_STATUS)
+        .filter(func.lower(func.trim(People.grade)) == grade.lower())
+        .order_by(People.full_name)
+        .all()
+    )
+
+    return [row[0] for row in results]
 
 # Helper for preventing reason when end of day sign out
 def should_ask_reason_and_return_time(user_type):

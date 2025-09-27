@@ -1,7 +1,22 @@
 import gspread
 from google.oauth2.service_account import Credentials
 import os
-from config import COLUMN_HEADERS_ARRAY, COLUMN_DATE, COLUMN_ACTION, COLUMN_NAME, COLUMN_REASON, COLUMN_TIME, COLUMN_USER_TYPE, COLUMN_GRADE, COLUMN_PHONE, COLUMN_RETURN_TIME, COLUMNS_TOTAL, COLUMN_CHECK, COLUMNS_TOTAL_INT
+
+from bps_internal_tools.kiosks.signin.config import (
+    COLUMN_ACTION,
+    COLUMN_CHECK,
+    COLUMN_DATE,
+    COLUMN_GRADE,
+    COLUMN_HEADERS_ARRAY,
+    COLUMN_NAME,
+    COLUMN_PHONE,
+    COLUMN_REASON,
+    COLUMN_RETURN_TIME,
+    COLUMN_TIME,
+    COLUMN_USER_TYPE,
+    COLUMNS_TOTAL,
+    COLUMNS_TOTAL_INT,
+)
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_CREDENTIALS_PATH')

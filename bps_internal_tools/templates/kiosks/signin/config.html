@@ -6,18 +6,28 @@
     <title>Brockton Sign In Tool Configuration</title>
     <!-- Link to external stylesheet -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='config-styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='kiosks/signin/config-styles.css') }}">
 </head>
 <body>
     <h1>Upload New Personnel CSV</h1>
     <p>Warning: Uploading a new file will overwrite the existing <strong>personnel.csv</strong>.</p>
 
-    <form action="/upload_csv" method="POST" enctype="multipart/form-data">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('kiosks_signin.upload_csv') }}" method="POST" enctype="multipart/form-data">
         <label for="file">Choose personnel.csv:</label>
         <input type="file" id="file" name="file" accept=".csv" required>
         <button type="submit">Upload</button>
     </form>
 
-    <p><a href="/">Back to Home</a></p>
+    <p><a href="{{ url_for('kiosks_signin.index') }}">Back to Home</a></p>
 </body>
 </html>

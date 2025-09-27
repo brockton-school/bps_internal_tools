@@ -7,17 +7,17 @@
     
     <!-- Link to external stylesheet -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='kiosks/signin/styles.css') }}">
 </head>
 <body>
     <h1>Please select most applicable.</h1>
-    <form action="/name" method="POST">
+    <form action="{{ url_for('kiosks_signin.name') }}" method="POST">
         <button name="user_type" value="Student">Student</button>
         <button name="user_type" value="Staff">Staff</button>
         <button name="user_type" value="Visitor">Visitor</button>
     </form>
 
     <!-- Include the footer with git info -->
-    {% include 'footer.html' %}
+    {% include 'kiosks/signin/footer.html' %}
 </body>
 </html>
