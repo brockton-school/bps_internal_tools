@@ -20,10 +20,17 @@ from bps_internal_tools.kiosks.signin.config import (
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_CREDENTIALS_PATH')
+SIGNIN_GOOGLE_SHEET_ID = os.getenv('SIGNIN_GOOGLE_SHEET_ID') or os.getenv('GOOGLE_SHEET_ID')
+
+if not SIGNIN_GOOGLE_SHEET_ID:
+    raise RuntimeError(
+        "SIGNIN_GOOGLE_SHEET_ID environment variable must be set "
+        "(optionally falling back to GOOGLE_SHEET_ID)."
+    )
 
 credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 client = gspread.authorize(credentials)
-spreadsheet = client.open_by_key(os.getenv('GOOGLE_SHEET_ID'))
+spreadsheet = client.open_by_key(SIGNIN_GOOGLE_SHEET_ID)
 
 def get_or_create_sheet(sheet_name):
     """Check if a sheet with the given name exists, otherwise create it."""
