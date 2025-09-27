@@ -1,3 +1,4 @@
+import re
 from typing import Dict, List, Optional
 
 from sqlalchemy import func, select
@@ -11,6 +12,9 @@ _ACTIVE_STATUS = "active"
 
 # Reusable predicate: real Canvas courses c + digits only (e.g., c003936)
 _COURSE_ID_REGEX = r'^c[0-9]+$'
+
+# Reusable predicate: real Canvas/system users u + digits only (e.g., u003936)
+_USER_ID_PATTERN = re.compile(r"^u\d{6}$")
 
 def search_teacher_by_name(query):
     q = f"%{query.lower()}%"
@@ -182,7 +186,7 @@ def get_personnel_suggestions(query: str, user_type: str, grade: str) -> List[st
     if not query:
         return []
 
-    people_query = db.session.query(People.full_name).filter(
+    people_query = db.session.query(People.full_name, People.user_id).filter(
         func.lower(People.status) == _ACTIVE_STATUS
     )
 
@@ -211,7 +215,7 @@ def get_personnel_suggestions(query: str, user_type: str, grade: str) -> List[st
         .all()
     )
 
-    return [row[0] for row in results]
+    return [name for name, user_id in results if _USER_ID_PATTERN.match(user_id or "")]
 
 
 def get_school_level(full_name: str) -> str:
