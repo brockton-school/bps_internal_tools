@@ -20,7 +20,7 @@ from bps_internal_tools.kiosks.signin.config import (
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_CREDENTIALS_PATH')
-SIGNIN_GOOGLE_SHEET_ID = os.getenv('SIGNIN_GOOGLE_SHEET_ID') or os.getenv('GOOGLE_SHEET_ID')
+SIGNIN_GOOGLE_SHEET_ID = os.getenv('SIGNIN_GOOGLE_SHEET_ID') or os.getenv('TOC_GOOGLE_SHEET_ID')
 
 if not SIGNIN_GOOGLE_SHEET_ID:
     raise RuntimeError(

@@ -89,8 +89,8 @@ cp .env.example .env
 ```
 Then update as needed (set `DATABASE_URL`, Google OAuth credentials, etc.). Key Google Sheets variables:
 
-* `GOOGLE_SHEET_ID` → TOC Attendance Google Sheet ID
-* `SIGNIN_GOOGLE_SHEET_ID` → Sign-in kiosk Google Sheet ID (falls back to `GOOGLE_SHEET_ID` if unset)
+* `TOC_GOOGLE_SHEET_ID` → TOC Attendance Google Sheet ID
+* `SIGNIN_GOOGLE_SHEET_ID` → Sign-in kiosk Google Sheet ID
 
 Create `auth_users.csv`:
 
@@ -160,7 +160,7 @@ Open: `http://localhost:5000/`
 ## 🛠️ Troubleshooting
 
 * **404 on tool routes**: ensure blueprint imports execute (import routes in `your_tool/__init__.py`)
-* **Sheets write errors**: check `GOOGLE_CREDENTIALS_PATH`, `GOOGLE_SHEET_ID`, and `SIGNIN_GOOGLE_SHEET_ID`
+* **Sheets write errors**: check `GOOGLE_CREDENTIALS_PATH`, `TOC_GOOGLE_SHEET_ID`, and `SIGNIN_GOOGLE_SHEET_ID`
 * **Auth won’t work**: verify `AUTH_USERS_CSV`, `SECRET_KEY`, and password hashes
 
 ## 📦 Deployment
