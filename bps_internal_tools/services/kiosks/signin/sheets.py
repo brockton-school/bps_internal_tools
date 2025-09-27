@@ -2,21 +2,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 import os
 
-from bps_internal_tools.kiosks.signin.config import (
-    COLUMN_ACTION,
-    COLUMN_CHECK,
-    COLUMN_DATE,
-    COLUMN_GRADE,
-    COLUMN_HEADERS_ARRAY,
-    COLUMN_NAME,
-    COLUMN_PHONE,
-    COLUMN_REASON,
-    COLUMN_RETURN_TIME,
-    COLUMN_TIME,
-    COLUMN_USER_TYPE,
-    COLUMNS_TOTAL,
-    COLUMNS_TOTAL_INT,
-)
+from bps_internal_tools.config import SignInKioskConfig
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_CREDENTIALS_PATH')
@@ -37,8 +23,10 @@ def get_or_create_sheet(sheet_name):
     try:
         worksheet = spreadsheet.worksheet(sheet_name)
     except gspread.exceptions.WorksheetNotFound:
-        worksheet = spreadsheet.add_worksheet(title=sheet_name, rows="500", cols=COLUMNS_TOTAL)
-        worksheet.append_row(COLUMN_HEADERS_ARRAY)  # Add headers
+        worksheet = spreadsheet.add_worksheet(
+            title=sheet_name, rows="500", cols=SignInKioskConfig.COLUMNS_TOTAL
+        )
+        worksheet.append_row(SignInKioskConfig.COLUMN_HEADERS_ARRAY)  # Add headers
 
         # Bold the header row and freeze it
         bold_format = {
@@ -78,7 +66,7 @@ def get_or_create_sheet(sheet_name):
                         'sheetId': worksheet.id,
                         'startRowIndex': 0,  # Header row starts at 0
                         'startColumnIndex': 0,  # Start from the first column
-                        'endColumnIndex': COLUMNS_TOTAL_INT + 1  # Adjust based on your sheet's columns
+                        'endColumnIndex': SignInKioskConfig.COLUMNS_TOTAL_INT + 1  # Adjust based on your sheet's columns
                     }
                 }
             }
@@ -91,8 +79,8 @@ def get_or_create_sheet(sheet_name):
                     "sheetId": worksheet.id,
                     "startRowIndex": 1,  # From the second row (after headers)
                     "endRowIndex": 100,  # Apply to the rest of the rows
-                    "startColumnIndex": COLUMN_NAME,  # Name column
-                    "endColumnIndex": COLUMN_NAME + 1  # Apply to Name column
+                    "startColumnIndex": SignInKioskConfig.COLUMN_NAME,  # Name column
+                    "endColumnIndex": SignInKioskConfig.COLUMN_NAME + 1  # Apply to Name column
                 },
                 "cell": {
                     "userEnteredFormat": {
@@ -109,8 +97,8 @@ def get_or_create_sheet(sheet_name):
                     "sheetId": worksheet.id,
                     "startRowIndex": 1,  # From the second row (after headers)
                     "endRowIndex": 100,  # Apply to the rest of the rows
-                    "startColumnIndex": COLUMN_TIME,  # Time column
-                    "endColumnIndex": COLUMN_TIME + 1  # Apply to Time column
+                    "startColumnIndex": SignInKioskConfig.COLUMN_TIME,  # Time column
+                    "endColumnIndex": SignInKioskConfig.COLUMN_TIME + 1  # Apply to Time column
                 },
                 "cell": {
                     "userEnteredFormat": {
@@ -128,8 +116,8 @@ def get_or_create_sheet(sheet_name):
                     "ranges": [
                         {
                             "sheetId": worksheet.id,
-                            "startColumnIndex": COLUMN_ACTION,  # Action column
-                            "endColumnIndex": COLUMN_ACTION + 1
+                            "startColumnIndex": SignInKioskConfig.COLUMN_ACTION,  # Action column
+                            "endColumnIndex": SignInKioskConfig.COLUMN_ACTION + 1
                         }
                     ],
                     "booleanRule": {
@@ -152,8 +140,8 @@ def get_or_create_sheet(sheet_name):
                     "ranges": [
                         {
                             "sheetId": worksheet.id,
-                            "startColumnIndex": COLUMN_ACTION,  # Action column
-                            "endColumnIndex": COLUMN_ACTION + 1
+                            "startColumnIndex": SignInKioskConfig.COLUMN_ACTION,  # Action column
+                            "endColumnIndex": SignInKioskConfig.COLUMN_ACTION + 1
                         }
                     ],
                     "booleanRule": {
@@ -177,8 +165,8 @@ def get_or_create_sheet(sheet_name):
                     "ranges": [
                         {
                             "sheetId": worksheet.id,
-                            "startColumnIndex": COLUMN_USER_TYPE,  # User Type column
-                            "endColumnIndex": COLUMN_USER_TYPE + 1
+                            "startColumnIndex": SignInKioskConfig.COLUMN_USER_TYPE,  # User Type column
+                            "endColumnIndex": SignInKioskConfig.COLUMN_USER_TYPE + 1
                         }
                     ],
                     "booleanRule": {
@@ -201,8 +189,8 @@ def get_or_create_sheet(sheet_name):
                     "ranges": [
                         {
                             "sheetId": worksheet.id,
-                            "startColumnIndex": COLUMN_USER_TYPE,  # User Type column
-                            "endColumnIndex": COLUMN_USER_TYPE + 1
+                            "startColumnIndex": SignInKioskConfig.COLUMN_USER_TYPE,  # User Type column
+                            "endColumnIndex": SignInKioskConfig.COLUMN_USER_TYPE + 1
                         }
                     ],
                     "booleanRule": {
@@ -225,8 +213,8 @@ def get_or_create_sheet(sheet_name):
                     "ranges": [
                         {
                             "sheetId": worksheet.id,
-                            "startColumnIndex": COLUMN_USER_TYPE,  # User Type column
-                            "endColumnIndex": COLUMN_USER_TYPE + 1
+                            "startColumnIndex": SignInKioskConfig.COLUMN_USER_TYPE,  # User Type column
+                            "endColumnIndex": SignInKioskConfig.COLUMN_USER_TYPE + 1
                         }
                     ],
                     "booleanRule": {
@@ -247,8 +235,8 @@ def get_or_create_sheet(sheet_name):
             'repeatCell': {
                 'range': {
                     'sheetId': worksheet.id,
-                    'startColumnIndex': COLUMN_CHECK,  # Adjust the column index as needed
-                    'endColumnIndex': COLUMN_CHECK + 1,
+                    'startColumnIndex': SignInKioskConfig.COLUMN_CHECK,  # Adjust the column index as needed
+                    'endColumnIndex': SignInKioskConfig.COLUMN_CHECK + 1,
                     'startRowIndex': 1,  # Skip header row
                 },
                 'cell': {
