@@ -1,25 +1,13 @@
 """Configuration values for the sign-in kiosk."""
 
-SIGN_OUT_REASONS_STAFF = [
-    "Medical Appointment",
-    "Personal Appointment",
-    "Professional Development",
-    "Meeting",
-    "Other",
-]
+# Define preset options for the "reason"
+SIGN_OUT_REASONS_STAFF      = ["Lunch", "Sick", "Appointment", "Meeting", "Field Trip", "Going Home"]
+SIGN_OUT_REASONS_STUDENT    = ["Lunch", "Sick", "Appointment"]
+# Remember to send parent contact to school for sick, or appointment
 
-SIGN_OUT_REASONS_STUDENT = [
-    "Medical Appointment",
-    "Illness",
-    "Family Commitment",
-    "Athletics",
-    "Other",
-]
-
-STUDENT_SIGN_OUT_MESSAGE = "Please remember to sign back in at the office when you return."
-STUDENT_SIGN_IN_MESSAGE = "Please head straight to class after signing in."
-
-PERSONNEL_CSV_PATH = "/app/env/personnel.csv"
+# Reminders shown to students on confirmation
+STUDENT_SIGN_OUT_MESSAGE = "Your parent must contact the school for illness or appointment related departures."
+STUDENT_SIGN_IN_MESSAGE = "Please remember to collect your Late Slip, if late for class."
 
 COLUMN_HEADERS_ARRAY = [
     "Date",

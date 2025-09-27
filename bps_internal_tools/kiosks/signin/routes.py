@@ -5,7 +5,6 @@ from flask import Blueprint, flash, jsonify, redirect, render_template, request,
 
 from bps_internal_tools.kiosks.signin.config import (
     COLUMN_HEADERS_ARRAY,
-    PERSONNEL_CSV_PATH,
     SIGN_OUT_REASONS_STAFF,
     SIGN_OUT_REASONS_STUDENT,
     STUDENT_SIGN_IN_MESSAGE,
@@ -201,28 +200,3 @@ def student_names():
     students = get_student_names_by_grade(grade)
 
     return jsonify(students)
-
-
-@signin_bp.route("/config")
-def config():
-    """Render the configuration page."""
-    return render_template("kiosks/signin/config.html")
-
-
-@signin_bp.route("/upload_csv", methods=["POST"])
-def upload_csv():
-    """Handle CSV file upload and overwrite the existing personnel.csv."""
-    if "file" not in request.files:
-        flash("No file part")
-        return redirect(url_for("kiosks_signin.config"))
-
-    file = request.files["file"]
-
-    if file.filename == "" or not file.filename.endswith(".csv"):
-        flash("Invalid file selected. Please upload a .csv file.")
-        return redirect(url_for("kiosks_signin.config"))
-
-    file.save(PERSONNEL_CSV_PATH)
-    flash("Personnel CSV uploaded successfully and overwritten.")
-
-    return redirect(url_for("kiosks_signin.config"))
