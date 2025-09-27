@@ -218,14 +218,14 @@ def get_personnel_suggestions(query: str, user_type: str, grade: str) -> List[st
     return [name for name, user_id in results if _USER_ID_PATTERN.match(user_id or "")]
 
 
-def get_school_level(full_name: str) -> str:
+def get_user_type(full_name: str) -> str:
     """Return the school level suffix for a staff member if available."""
 
     if not full_name:
         return ""
 
     person = (
-        db.session.query(People.grade)
+        db.session.query(People.user_type)
         .filter(func.lower(People.status) == _ACTIVE_STATUS)
         .filter(func.lower(People.full_name) == full_name.lower())
         .first()
@@ -234,14 +234,14 @@ def get_school_level(full_name: str) -> str:
     if not person:
         return ""
 
-    grade = (person[0] or "").strip()
-    if not grade:
+    user_type = (person[0] or "").strip()
+    if not user_type:
         return ""
 
-    grade_upper = grade.upper()
-    if grade_upper in {"JS", "SS"}:
-        return f" ({grade_upper})"
-    if grade_upper == "ADMIN":
+    user_type_upper = user_type.upper()
+    if user_type_upper in {"JS", "SS"}:
+        return f" ({user_type_upper})"
+    if user_type_upper == "ADMIN":
         return " (Admin)"
 
     return ""

@@ -20,7 +20,7 @@ from bps_internal_tools.services.kiosks.signin.utils import (
 from bps_internal_tools.services.queries import (
     get_grades,
     get_personnel_suggestions,
-    get_school_level,
+    get_user_type,
     get_student_names_by_grade,
 )
 
@@ -117,7 +117,7 @@ def submit():
     # Get staff classifications (JS/SS/Admin)
     user_type_classified = ""
     if user_type == "Staff":
-        user_type_classified = user_type + get_school_level(name)
+        user_type_classified = user_type + get_user_type(name)
     else:
         user_type_classified = user_type
 
