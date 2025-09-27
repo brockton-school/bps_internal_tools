@@ -1,26 +1,22 @@
 from datetime import datetime
 
-import pytz
-from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 
-from bps_internal_tools.kiosks.signin.config import (
-    COLUMN_HEADERS_ARRAY,
-    SIGN_OUT_REASONS_STAFF,
-    SIGN_OUT_REASONS_STUDENT,
-    STUDENT_SIGN_IN_MESSAGE,
-    STUDENT_SIGN_OUT_MESSAGE,
-)
+from bps_internal_tools.config import SignInKioskConfig
 from bps_internal_tools.services.kiosks.signin.excel import save_to_local_file
 from bps_internal_tools.services.kiosks.signin.sheets import get_or_create_sheet
 from bps_internal_tools.services.kiosks.signin.utils import (
-    format_time,
+    should_ask_reason_and_return_time,
+)
+from bps_internal_tools.services.queries import (
     get_grades,
     get_personnel_suggestions,
     get_school_level,
     get_student_names_by_grade,
-    get_version_info,
-    should_ask_reason_and_return_time,
 )
+
+from bps_internal_tools.services.settings import get_system_tzinfo
+from bps_internal_tools.services.utils import format_time, get_version_info
 
 signin_bp = Blueprint("kiosks_signin", __name__)
 
@@ -28,7 +24,13 @@ signin_bp = Blueprint("kiosks_signin", __name__)
 @signin_bp.route("/")
 def index():
     # Get the git information
-    version_text = get_version_info()
+    version_info = get_version_info()
+    if isinstance(version_info, dict):
+        version = version_info.get("version") or "unknown"
+        commit = version_info.get("commit") or "unknown"
+        version_text = f"Version: {version} ({commit})"
+    else:
+        version_text = str(version_info)
     return render_template("kiosks/signin/index.html", version_text=version_text)
 
 
@@ -59,9 +61,9 @@ def signinout():
 
     reasons = []
     if user_type == "Student":
-        reasons = SIGN_OUT_REASONS_STUDENT
+        reasons = SignInKioskConfig.SIGN_OUT_REASONS_STUDENT
     else:
-        reasons = SIGN_OUT_REASONS_STAFF
+        reasons = SignInKioskConfig.SIGN_OUT_REASONS_STAFF
 
     reason_needed = should_ask_reason_and_return_time(user_type)
 
@@ -110,9 +112,9 @@ def submit():
     if action == "Signing In":
         return_time = ''
 
-    # Get current time in Vancouver timezone
-    vancouver_tz = pytz.timezone("America/Vancouver")
-    current_time = datetime.now(vancouver_tz)
+    # Get current time using the configured system timezone
+    system_timezone = get_system_tzinfo()
+    current_time = datetime.now(system_timezone)
     current_date = current_time.strftime("%Y-%m-%d")
     current_time_formatted = format_time(current_time)
 
@@ -120,19 +122,19 @@ def submit():
 
     # Dict for sheet data
     entry = {
-        COLUMN_HEADERS_ARRAY[0]: current_date,
-        COLUMN_HEADERS_ARRAY[1]: current_time_formatted,
-        COLUMN_HEADERS_ARRAY[2]: name,
-        COLUMN_HEADERS_ARRAY[3]: action,
-        COLUMN_HEADERS_ARRAY[4]: user_type_classified,
-        COLUMN_HEADERS_ARRAY[5]: grade,
-        COLUMN_HEADERS_ARRAY[6]: reason,
-        COLUMN_HEADERS_ARRAY[7]: return_time,
-        COLUMN_HEADERS_ARRAY[8]: visitor_phone,
-        COLUMN_HEADERS_ARRAY[9]: visitor_affiliation,
-        COLUMN_HEADERS_ARRAY[10]: visitor_vehicle,
-        COLUMN_HEADERS_ARRAY[11]: account,
-        COLUMN_HEADERS_ARRAY[12]: "",
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[0]: current_date,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[1]: current_time_formatted,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[2]: name,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[3]: action,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[4]: user_type_classified,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[5]: grade,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[6]: reason,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[7]: return_time,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[8]: visitor_phone,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[9]: visitor_affiliation,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[10]: visitor_vehicle,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[11]: account,
+        SignInKioskConfig.COLUMN_HEADERS_ARRAY[12]: "",
     }
 
     # Create or get the sheet and append the row
@@ -170,9 +172,9 @@ def submit():
     sub_message = ""
     if user_type == "Student":
         if action == "Signing In":
-            sub_message = STUDENT_SIGN_IN_MESSAGE
+            sub_message = SignInKioskConfig.STUDENT_SIGN_IN_MESSAGE
         else:
-            sub_message = STUDENT_SIGN_OUT_MESSAGE
+            sub_message = SignInKioskConfig.STUDENT_SIGN_OUT_MESSAGE
 
     return render_template(
         "kiosks/signin/confirmation.html",
