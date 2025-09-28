@@ -1,7 +1,7 @@
 import re
 from typing import Dict, List, Optional
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 
 from bps_internal_tools.extensions import db
 from bps_internal_tools.models import Course, Enrollment, GradeSection, People
@@ -15,6 +15,26 @@ _COURSE_ID_REGEX = r'^c[0-9]+$'
 
 # Reusable predicate: real Canvas/system users u + digits only (e.g., u003936)
 _USER_ID_PATTERN = re.compile(r"^u\d{6}$")
+
+def get_all_staff() -> List[People]:
+    """Return active Canvas staff (no grade) ordered by name."""
+
+    stmt = (
+        select(People)
+        .where(People.user_id.like("u______"))
+        .where(People.status == "active")
+        .where(or_(People.grade.is_(None), func.trim(People.grade) == ""))
+        .where(
+            or_(
+                People.user_type.is_(None),
+                func.lower(func.trim(People.user_type)) != "utility",
+            )
+        )
+        .order_by(People.last_name, People.first_name)
+    )
+
+    return list(db.session.scalars(stmt))
+
 
 def search_teacher_by_name(query):
     q = f"%{query.lower()}%"
@@ -193,6 +213,11 @@ def get_personnel_suggestions(query: str, user_type: str, grade: str) -> List[st
     if user_type == "Staff":
         people_query = people_query.filter(
             (People.grade.is_(None)) | (func.trim(People.grade) == "")
+        ).filter(
+            or_(
+                People.user_type.is_(None),
+                func.lower(func.trim(People.user_type)) != "utility",
+            )
         )
     elif user_type == "Student":
         if grade:
@@ -239,6 +264,8 @@ def get_user_type(full_name: str) -> str:
         return ""
 
     user_type_upper = user_type.upper()
+    if user_type_upper == "UTILITY":
+        return ""
     if user_type_upper in {"JS", "SS"}:
         return f" ({user_type_upper})"
     if user_type_upper == "ADMIN":

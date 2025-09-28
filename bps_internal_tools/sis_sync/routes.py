@@ -17,6 +17,7 @@ from bps_internal_tools.extensions import db
 from bps_internal_tools.models import People, UserImport, UserChangeLog
 from bps_internal_tools.services.auth import login_required, tool_required
 from bps_internal_tools.services.canvas import CanvasAPIError, sis_import
+from bps_internal_tools.services.queries import get_all_staff
 from . import sis_sync_bp, TOOL_SLUG
 
 
@@ -107,6 +108,11 @@ def import_csv():
             if person.grade != data["grade"]:
                 changes["grade"] = (person.grade, data["grade"])
                 person.grade = data["grade"]
+            has_grade = bool(data["grade"])
+            current_user_type = (person.user_type or "").lower()
+            if has_grade and current_user_type != "student":
+                changes["user_type"] = (person.user_type, "student")
+                person.user_type = "student"
             if person.status != "active":
                 old = person.status
                 person.status = "active"
@@ -129,6 +135,7 @@ def import_csv():
                 login_id=data["email"],
                 authentication_provider_id="114",
                 grade=data["grade"],
+                user_type="student" if data["grade"] else None,
                 status="active",
                 updated_at=now,
                 status_changed_at=now,
@@ -297,5 +304,46 @@ def custom_users():
         users=customs,
         page_title="Custom Users",
         page_subtitle="Manage non-SIS users",
+        active_tool="SIS Sync",
+    )
+
+
+@sis_sync_bp.route("/staff-types", methods=["GET", "POST"])
+@login_required
+@tool_required(TOOL_SLUG)
+def staff_classification():
+    if request.method == "POST":
+        staff_members = get_all_staff()
+        now = datetime.utcnow()
+        updates = 0
+        valid_types = {"JS", "SS", "ADMIN", "UTILITY"}
+        for person in staff_members:
+            field_name = f"user_type_{person.user_id}"
+            selected = request.form.get(field_name)
+            if selected is None:
+                continue
+            selected = (selected or "").strip().upper()
+            if selected and selected not in valid_types:
+                continue
+            normalized = selected or None
+            current = (person.user_type or "").strip().upper() or None
+            if current == normalized:
+                continue
+            person.user_type = normalized
+            person.updated_at = now
+            updates += 1
+        if updates:
+            db.session.commit()
+            flash(f"Updated {updates} staff classification{'s' if updates != 1 else ''}.", "success")
+        else:
+            flash("No staff classifications changed.", "info")
+        return redirect(url_for("sis_sync.staff_classification"))
+
+    staff_members = get_all_staff()
+    return render_template(
+        "sis_sync/staff_classification.html",
+        staff=staff_members,
+        page_title="Staff Classification",
+        page_subtitle="Assign staff user types",
         active_tool="SIS Sync",
     )
