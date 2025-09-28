@@ -10,6 +10,7 @@ from flask import (
     send_file,
     current_app,
     flash,
+    make_response,
 )
 from sqlalchemy import select
 
@@ -340,6 +341,25 @@ def staff_classification():
         return redirect(url_for("sis_sync.staff_classification"))
 
     staff_members = get_all_staff()
+
+    if request.args.get("download") == "1":
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["first_name", "last_name", "user_type"])
+        for person in staff_members:
+            writer.writerow(
+                [
+                    (person.first_name or "").strip(),
+                    (person.last_name or "").strip(),
+                    (person.user_type or "").strip(),
+                ]
+            )
+
+        response = make_response(output.getvalue())
+        response.headers["Content-Disposition"] = "attachment; filename=staff_user_types.csv"
+        response.headers["Content-Type"] = "text/csv"
+        return response
+
     return render_template(
         "sis_sync/staff_classification.html",
         staff=staff_members,

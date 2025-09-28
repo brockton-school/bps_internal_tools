@@ -3,6 +3,9 @@
 <div class="card">
   <h2 style="margin-top:0">Staff Classification</h2>
   <p>Assign a school level to active staff members without a grade.</p>
+  <div style="margin: 1em 0">
+    <a class="btn" href="{{ url_for('sis_sync.staff_classification', download='1') }}">Download Staff Types CSV</a>
+  </div>
   {% if staff %}
   <form method="post">
     <table class="table">
