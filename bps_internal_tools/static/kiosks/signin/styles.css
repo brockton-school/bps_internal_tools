@@ -1,0 +1,279 @@
+body {
+    background-color: #ffffff;
+    color: #bb2023;
+    font-family: 'Nunito Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 10px;
+    padding: 0;
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-weight: 700;  /* Bold */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+}
+
+button, input[type="text"] {
+    background-color: #bb2023; 
+    color: white;
+    border: none;
+    border-radius: 12px;
+    margin: 10px 0;
+    padding: 20px;
+    font-size: 18px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button:hover {
+    background-color: #bb4547; /* Slightly darker red on hover */
+}
+
+/* Textfield styles */
+input[type="text"] {
+    color: #bb2023;
+    border: 2px solid #bb2023;  /* Red outline */
+    background-color: white;  /* White background */
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    box-shadow: 0 0 5px red;
+}
+
+/* Reset button styling */
+.reset-btn {
+    position: fixed;  /* Fixed positioning so it stays in the top-left corner */
+    top: 10px;
+    left: 10px;
+    background-color: #bb2023;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    z-index: 1000;  /* Ensure the button stays on top of other content */
+}
+
+.reset-btn:hover {
+    background-color: #bb4547;
+}
+
+/* Hide reason field, visitors, and return times initially */
+#reason-field {
+    display: none;
+}
+
+#visitor-reason {
+    display: none;
+}
+
+#return-time {
+    display: none;
+}
+
+#action-buttons {
+    display: block;
+}
+
+
+
+/* Styles for visitor sign in stuff */
+#visitor-reason h1 {
+    text-align: center;
+}
+
+/* Styles for Conf page */
+.confirmation-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    background-color: white;
+    font-family: 'Nunito Sans', sans-serif;
+    text-align: center;
+}
+
+.confirmation-message {
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Grid container for the grade (and student name) buttons */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));  /* Adjusts the number of columns based on screen size */
+    gap: 10px;  /* Space between buttons */
+    justify-items: center;  /* Center the buttons horizontally */
+    margin: 20px 0;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+/* Grade button styles */
+.grade-btn {
+    width: 100%;
+    height: 100px;
+    background-color: #bb2023;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* Styles for Autocomplete */
+
+/* Remove the absolute positioning and let suggestions be part of the document flow */
+.autocomplete-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;  /* Add space between the suggestions list and the "Next" button */
+}
+
+/* Autocomplete suggestions list */
+.autocomplete-items {
+    border: 1px solid #d4d4d4;
+    background-color: #fff;
+    z-index: 99;
+    max-height: 200px;
+    overflow-y: auto;  /* Scroll if the list gets too long */
+    font-size: 18px;
+    margin-top: 5px;  /* Small margin between input field and suggestions */
+}
+
+/* Each suggestion item */
+.autocomplete-item {
+    padding: 15px;  /* Increase padding for larger clickable area */
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
+}
+
+.autocomplete-item:hover {
+    background-color: #e9e9e9;
+}
+
+.autocomplete-item.active {
+    background-color: #1e90ff;
+    color: #fff;
+}
+
+/* Student Name Entry Buttons */
+.name-btn {
+    width: 100%;
+    height: 100px;
+    background-color: #bb2023;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: bolder;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+form.student-name-form {
+    max-width: 1000px;
+}
+
+/* Return Time Inputs */
+/* Make time buttons square */
+.time-buttons {
+    display: flex;
+    gap: 10px;  /* Space between buttons */
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.time-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    width: 80px;  /* Equal width and height to make them square */
+    height: 80px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 80px;  /* Align text vertically */
+}
+
+.time-btn:hover {
+    background-color: #45a049;
+}
+
+/* Custom time input styling */
+.custom-time-input {
+    display: block;
+    width: 100%;  /* Make the time input fill the width */
+    max-width: 400px;  /* Limit to a reasonable max width */
+    margin: 20px auto;
+    font-size: 18px;  /* Larger font for touch-friendly interaction */
+    padding: 10px;
+    border-radius: 12px;
+    border: 2px solid #ccc;
+    text-align: center;
+}
+
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background-color: #f1f1f1;
+    padding: 10px;
+    font-size: 14px;
+    color: #666;
+    border-top: 1px solid #ddd;
+    width: auto;
+    text-align: left;
+}
+
+.footer p {
+    margin: 0;
+    padding: 0;
+}
+
+/* laoding indicator for submit */
+.spinner {
+    margin: 10px auto;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #bb2023;
+    animation: spin 1s ease-in-out infinite;
+}
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

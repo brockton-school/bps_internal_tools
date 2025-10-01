@@ -1,11 +1,40 @@
-from sqlalchemy import select, func
-from bps_internal_tools.models import Course, People, Enrollment, GradeSection
-from typing import List, Dict, Optional
-from bps_internal_tools.extensions import db 
+import re
+from typing import Dict, List, Optional
+
+from sqlalchemy import func, or_, select
+
+from bps_internal_tools.extensions import db
+from bps_internal_tools.models import Course, Enrollment, GradeSection, People
+
+
+_ACTIVE_STATUS = "active"
 
 
 # Reusable predicate: real Canvas courses c + digits only (e.g., c003936)
 _COURSE_ID_REGEX = r'^c[0-9]+$'
+
+# Reusable predicate: real Canvas/system users u + digits only (e.g., u003936)
+_USER_ID_PATTERN = re.compile(r"^u\d{6}$")
+
+def get_all_staff() -> List[People]:
+    """Return active Canvas staff (no grade) ordered by name."""
+
+    stmt = (
+        select(People)
+        .where(People.user_id.like("u______"))
+        .where(People.status == "active")
+        .where(or_(People.grade.is_(None), func.trim(People.grade) == ""))
+        .where(
+            or_(
+                People.user_type.is_(None),
+                func.lower(func.trim(People.user_type)) != "utility",
+            )
+        )
+        .order_by(People.last_name, People.first_name)
+    )
+
+    return list(db.session.scalars(stmt))
+
 
 def search_teacher_by_name(query):
     q = f"%{query.lower()}%"
@@ -162,4 +191,111 @@ def get_students_in_grade_section(section_id: int) -> List[Dict]:
     return [{"user_id": uid, "full_name": full} for (uid, full) in rows]
 
 
+def get_grades() -> List[str]:
+    """Return a sorted list of distinct grades for active Canvas users."""
+
+    grade_rows = (
+        db.session.query(func.trim(People.grade))
+        .filter(func.lower(People.status) == _ACTIVE_STATUS)
+        .filter(People.grade.isnot(None))
+        .filter(func.trim(People.grade) != "")
+        .distinct()
+        .order_by(func.lower(People.grade))
+        .all()
+    )
+
+    return [row[0] for row in grade_rows]
+
+def get_personnel_suggestions(query: str, user_type: str, grade: str) -> List[str]:
+    """Return a list of matching names for the provided query."""
+
+    if not query:
+        return []
+
+    query = query.strip()
+    if not query:
+        return []
+
+    people_query = db.session.query(People.full_name, People.user_id).filter(
+        func.lower(People.status) == _ACTIVE_STATUS
+    )
+
+    if user_type == "Staff":
+        people_query = people_query.filter(
+            (People.grade.is_(None)) | (func.trim(People.grade) == "")
+        ).filter(
+            or_(
+                People.user_type.is_(None),
+                func.lower(func.trim(People.user_type)) != "utility",
+            )
+        )
+    elif user_type == "Student":
+        if grade:
+            people_query = people_query.filter(
+                func.lower(func.trim(People.grade)) == grade.lower()
+            )
+        else:
+            people_query = people_query.filter(
+                People.grade.isnot(None), func.trim(People.grade) != ""
+            )
+    else:
+        # Visitors are entered manually
+        return []
+
+    like_pattern = f"%{query.lower()}%"
+    results = (
+        people_query.filter(func.lower(People.full_name).like(like_pattern))
+        .order_by(People.full_name)
+        .limit(10)
+        .all()
+    )
+
+    return [name for name, user_id in results if _USER_ID_PATTERN.match(user_id or "")]
+
+
+def get_user_type(full_name: str) -> str:
+    """Return the school level suffix for a staff member if available."""
+
+    if not full_name:
+        return ""
+
+    person = (
+        db.session.query(People.user_type)
+        .filter(func.lower(People.status) == _ACTIVE_STATUS)
+        .filter(func.lower(People.full_name) == full_name.lower())
+        .first()
+    )
+
+    if not person:
+        return ""
+
+    user_type = (person[0] or "").strip()
+    if not user_type:
+        return ""
+
+    user_type_upper = user_type.upper()
+    if user_type_upper == "UTILITY":
+        return ""
+    if user_type_upper in {"JS", "SS"}:
+        return f" ({user_type_upper})"
+    if user_type_upper == "ADMIN":
+        return " (Admin)"
+
+    return ""
+
+def get_student_names_by_grade(grade: str) -> List[str]:
+    """Return a sorted list of active students for the provided grade."""
+
+    if not grade:
+        return []
+
+    results = (
+        db.session.query(People.full_name)
+        .filter(func.lower(People.status) == _ACTIVE_STATUS)
+        .filter(func.lower(func.trim(People.grade)) == grade.lower())
+        .order_by(People.full_name)
+        .all()
+    )
+
+    return [row[0] for row in results]
 
