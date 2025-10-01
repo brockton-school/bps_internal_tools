@@ -9,7 +9,8 @@ from bps_internal_tools.services.queries import (
     get_teachers_in_course,
     get_course_info,
     get_grade_sections,
-    get_grade_section
+    get_grade_section,
+    get_person,
 )
 from bps_internal_tools.services.sheets import log_attendance
 from bps_internal_tools.config import DEFAULT_TERMS
@@ -57,10 +58,12 @@ def select_course(teacher_id):
             )
         )
     courses = get_courses_for_user(teacher_id, role="teacher", terms=DEFAULT_TERMS)
+    teacher = get_person(teacher_id)
     return render_template(
         "toc-attendance/select_course.html",
         courses=courses,
         teacher_id=teacher_id,
+        teacher_name=teacher.get("full_name") if teacher else None,
         page_title="TOC Attendance",
         page_subtitle="Simple attendance form for senior school coverage.",
         active_tool="TOC Attendance",

@@ -2,21 +2,37 @@
 {% block title %}Select Course · TOC Attendance{% endblock %}
 {% block content %}
   <div class="card">
-    <div class="meta">Teacher ID: <strong>{{ teacher_id }}</strong></div>
-    <label for="course">Which course are you covering?</label>
-    <form method="post">
-      <select id="course" name="course_id" required>
-        {% for c in courses %}
-          <option value="{{ c.course_id }}">{{ c.short_name }} — {{ c.long_name }}</option>
-        {% endfor %}
-      </select>
+    <div class="meta">
+      Teacher:
+      <strong>
+        {% if teacher_name %}
+          {{ teacher_name }} ({{ teacher_id }})
+        {% else %}
+          {{ teacher_id }}
+        {% endif %}
+      </strong>
+    </div>
+    <form method="post" class="toc-select-course">
+      <div class="form-field">
+        <label for="course">Which course are you covering?</label>
+        <select id="course" name="course_id" required>
+          <option value="" disabled selected hidden>Select course…</option>
+          {% for c in courses %}
+            <option value="{{ c.course_id }}">{{ c.short_name }} — {{ c.long_name }}</option>
+          {% endfor %}
+        </select>
+        <p class="field-help">Placeholder text that explains how to interpret the course names will go here.</p>
+      </div>
 
-      <label for="block">Which block is this course in?</label>
-      <select id="block" name="block" required>
-        {% for i in range(1,7) %}
-          <option value="{{ i }}">Block {{ i }}</option>
-        {% endfor %}
-      </select>
+      <div class="form-field">
+        <label for="block">Which block is this course in?</label>
+        <select id="block" name="block" required>
+          <option value="" disabled selected hidden>Select block…</option>
+          {% for i in range(1,7) %}
+            <option value="{{ i }}">Block {{ i }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
       <button class="btn" type="submit">Continue to Attendance</button>
       <a class="btn secondary" href="{{ url_for('toc.index') }}">Back</a>
