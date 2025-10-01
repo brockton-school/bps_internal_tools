@@ -48,6 +48,16 @@ def get_courses_for_user(user_id: str, role: str | None = None, terms: list[str]
         for (cid, sname, lname) in rows
     ]
 
+def get_person(user_id: str) -> Optional[Dict]:
+    """Return the People row (user_id + full_name) for a given user id."""
+    s = db.session
+    row = s.execute(
+        select(People.user_id, People.full_name).where(People.user_id == user_id)
+    ).first()
+    if not row:
+        return None
+    uid, name = row
+    return {"user_id": uid, "full_name": name}
 
 def get_students_in_course(course_id: str) -> List[Dict]:
     """

@@ -23,7 +23,11 @@
 
   // Apply saved theme on load
   const saved = localStorage.getItem(THEME_KEY);
-  if(saved === 'light'){ body.setAttribute('data-theme','light'); }
+  if(saved === 'dark'){
+    body.removeAttribute('data-theme');
+  }else{
+    body.setAttribute('data-theme','light');
+  }
 
   // Toggle button
   const toggle = document.getElementById('themeToggleBtn');
