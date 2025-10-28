@@ -9,11 +9,11 @@ from bps_internal_tools.services.settings import get_system_tzinfo
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_CREDENTIALS_PATH', "/home/alan/bps_internal_tools/env/splendid-sunset-436122-n9-2a123c008b07.json")
-GOOGLE_SHEET_ID = os.getenv('GOOGLE_SHEET_ID', "1MqP7hlhQIpsFv8o8Y4tefU2p8eDOlUjH3ooP7_40i_M")
+TOC_GOOGLE_SHEET_ID = os.getenv('TOC_GOOGLE_SHEET_ID', "1MqP7hlhQIpsFv8o8Y4tefU2p8eDOlUjH3ooP7_40i_M")
 
 credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 client = gspread.authorize(credentials)
-sheet = client.open_by_key(GOOGLE_SHEET_ID)
+sheet = client.open_by_key(TOC_GOOGLE_SHEET_ID)
 
 def _now_local():
     return datetime.now(get_system_tzinfo())

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In or Sign Out</title>
+
+    <!-- Link to external stylesheet -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='kiosks/signin/styles.css') }}">
+
+    <!-- Link to external JS scripts -->
+    <script>
+        window.KIOSK_SIGNIN_CONFIG = {
+            homeUrl: "{{ url_for('kiosks_signin.index') }}"
+        };
+    </script>
+    <script src="{{ url_for('static', filename='kiosks/signin/scripts.js') }}"></script>
+</head>
+<body>
+    <h1 id="sign-in-out-header">Are you signing in or out?</h1>
+    <form id="signForm" action="{{ url_for('kiosks_signin.submit') }}" method="POST">
+        <input type="hidden" name="name" value="{{ name }}">
+        <input type="hidden" id="user-type-input" name="user_type" value="{{ user_type }}">
+        <input type="hidden" id="reason-needed-input" name="reason-needed" value="{{ reason_needed }}">
+        <input type="hidden" id="action-input" name="action" value="">
+        <input type="hidden" id="reason-input" name="reason" value="">
+        <input type="hidden" name="grade" value="{{ grade }}">  <!-- Add the grade field if applicable -->
+
+        <!-- Hidden input to store the selected time -->
+        <input type="hidden" id="return-time-input" name="return_time" value="None">
+
+        <!-- "X" Reset Button -->
+        <a href="{{ url_for('kiosks_signin.index') }}" class="reset-btn">X</a>
+
+        <!-- Sign In / Sign Out buttons -->
+        <div id="action-buttons">
+            <button type="button" class="action-btn" onclick="handleAction('Signing In', '{{ user_type }}', '{{ reason_needed }}')">Signing In</button>
+            <button type="button" class="action-btn" onclick="handleAction('Signing Out', '{{ user_type }}', '{{ reason_needed }}')">Signing Out</button>
+        </div>
+
+        <!-- Reason Field (hidden initially) -->
+        <div id="reason-field">
+            <h3 id="reason-header">Reason for Signing Out</h3>
+
+            <!-- Ask for manual reason first then provide drop down for presets -->
+            <label>Please enter your reason for signing out:</label>
+            <input type="text" id="other-reason-input" name="other_reason" placeholder="Enter your reason" onkeydown="submitOnEnter(event)">
+
+            <!-- Loop through the reasons and render them as buttons -->
+            <h3>Or select a reason from below:</h3>
+            {% for reason in reasons %}
+                <button type="button" class="reason-btn" onclick="setReason('{{ reason }}')">{{ reason }}</button>
+            {% endfor %}
+        </div>
+
+        <!-- Reason Field For Visitors (also hidden initially) -->
+        <div id="visitor-reason">
+            <h1>Welcome to Brockton School</h1>
+            <br>
+            <label>Please enter the reason for your visit:</label>
+            <input type="text" id="visitor-reason-input" name="visitor-reason" placeholder="Enter your reason">
+            <br>
+            <label>Organization affiliation (if applicable):</label>
+            <input type="text" id="visitor-affilitaion-input" name="visitor-affiliation" placeholder="Enter your reason">
+            <br>
+            <label>License Plate (if applicable):</label>
+            <input type="text" id="visitor-vehicle-input" name="visitor-vehicle" placeholder="AA0 000A">
+            <br>
+            <label>Contact Phone Number:</label>
+            <input type="text" id="visitor-phone-input" name="visitor-phone" placeholder="(604) 123-4567" pattern="^\(\d{3}\) \d{3}-\d{4}$" title="Phone number must be in the format: (123) 456-7890" onkeydown="submitVisitorOnEnter(event)">
+        </div>
+
+        <!-- Expected Return Time -->
+         <div id="return-time">
+            <h3>Are you returning?</h3>
+
+            <!-- Buttons for quick time selection -->
+            <div class="time-buttons">
+                <button type="button" onclick="selectReturnTime('None')">Not returning</button>
+                <!-- <button type="button" onclick="selectReturnTime('30min')">30min</button>
+                <button type="button" onclick="selectReturnTime('1 Hour')">1 Hour</button>
+                <button type="button" onclick="selectReturnTime('2 Hours')">2 Hours</button> -->
+            </div>
+
+            <!-- Are you returning? No or select return time -->
+
+            <!-- Custom time input field -->
+            <div>
+                <label for="custom-time">Please provide your return time:</label>
+                <input type="time" id="custom-time" name="custom_time" class="custom-time-input" onchange="selectCustomTime(this.value)">
+                <button type="submit">Submit</button>
+            </div>
+         </div>
+    </form>
+
+
+    <!-- Add this to your HTML where appropriate -->
+    <div id="loading-indicator" style="display: none; text-align: center; margin-top: 20px;">
+        <p>Submitting...</p>
+        <div class="spinner"></div>
+    </div>
+</body>
+</html>

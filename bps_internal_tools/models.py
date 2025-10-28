@@ -86,6 +86,7 @@ class People(db.Model):
     status = Column(String(64))
     pronouns = Column(String(255))
     grade = Column(String(64))
+    user_type = Column(String(64))
     updated_at = Column(DateTime)
     status_changed_at = Column(DateTime)
 

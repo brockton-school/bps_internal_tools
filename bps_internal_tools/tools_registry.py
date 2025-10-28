@@ -14,6 +14,12 @@ TOOLS = [
         "description": "Synchronize MySchool CSV data with Canvas.",
         "endpoint": ("sis_sync.index", {}),
     },
+    {
+        "slug": "kiosks_signin",
+        "name": "Sign-In Kiosk",
+        "description": "Front-desk kiosk for tracking arrivals and departures.",
+        "endpoint": ("kiosks_signin.index", {}),
+    },
     # Add more tools here as you grow…
 ]
 

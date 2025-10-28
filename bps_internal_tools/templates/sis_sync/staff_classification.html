@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2 style="margin-top:0">Staff Classification</h2>
+  <p>Assign a school level to active staff members.</p>
+  <div style="margin: 1em 0">
+    <a class="btn" href="{{ url_for('sis_sync.staff_classification', download='1') }}">Download Staff Types CSV</a>
+  </div>
+  {% if staff %}
+  <form method="post">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Staff Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for person in staff %}
+        <tr>
+          <td>{{ person.user_id }}</td>
+          <td>{{ person.full_name }}</td>
+          <td>{{ person.email }}</td>
+          <td>
+            <select class="input" name="user_type_{{ person.user_id }}">
+              <option value="">-- Select --</option>
+              {% for option in ["JS", "SS", "ADMIN", "UTILITY"] %}
+              <option value="{{ option }}" {% if person.user_type and person.user_type.upper() == option %}selected{% endif %}>{{ option }}</option>
+              {% endfor %}
+            </select>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button class="btn" type="submit">Save Changes</button>
+  </form>
+  {% else %}
+  <p>No staff members require classification.</p>
+  {% endif %}
+</div>
+{% endblock %}
